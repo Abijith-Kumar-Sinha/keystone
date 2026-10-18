@@ -1,6 +1,6 @@
 # Submission answers (copy and paste)
 
-Everything the WeMakeDevs form is likely to ask, in the order the rules list it. Fill the three marked links, then paste.
+Everything the WeMakeDevs form is likely to ask, in the order the rules list it.
 
 | Field | Answer |
 |---|---|
@@ -8,8 +8,8 @@ Everything the WeMakeDevs form is likely to ask, in the order the rules list it.
 | Track entered | **Track 01: Agents That Act on Connected Data** (only this one) |
 | Public repository | https://github.com/Abijith-Kumar-Sinha/keystone |
 | Live deployment | https://keystone-2d8k.onrender.com (free instance: open it a minute before judging starts) |
-| Demo video | **FILL IN: your YouTube (unlisted) link** |
-| Blog post (side prize, optional) | **FILL IN if you publish it** (draft in `docs/BLOG.md`) |
+| Demo video | https://youtu.be/Wlu6MXQgoAk |
+| Blog post (side prize, optional) | Not submitted (a draft is in `docs/BLOG.md`) |
 
 ## One line
 
@@ -57,7 +57,7 @@ The code in this repository was written with an AI coding assistant, Claude Code
 
 ## Team and who did what
 
-**FILL IN, one line per person, in your own words.** Example: "Abijith Kumar Sinha: product idea, review and direction of every decision, data choice, demo video, can explain the graph model, queries and architecture."
+Abijith Kumar Sinha: picked Track 01 and signed off on the product idea and scope, set the interface direction (chose the "Stand By" design and its minimal-text rule), pushed for a real model behind the agent and an honest evaluation of it, set up the model keys and deployed the live demo, and reviewed the results at each step. The code was written with Claude Code under his direction, as disclosed above.
 
 ## Anticipated questions
 

@@ -7,8 +7,7 @@ Built for **Graph Hacks: Context for AI Agents** (WeMakeDevs x FalkorDB). **Trac
 | | |
 |---|---|
 | Live demo | https://keystone-2d8k.onrender.com (a free instance sleeps when idle: the first visit after a quiet spell takes about a minute) |
-| Demo video | _to be added_ |
-| Blog post | _to be added_ |
+| Demo video | https://youtu.be/Wlu6MXQgoAk |
 | MCP endpoint | https://keystone-2d8k.onrender.com/mcp (streamable HTTP) |
 
 ![Keystone landing page](docs/img/landing.jpg)
@@ -194,9 +193,9 @@ Required by the hackathon rules, so stated plainly:
 - Interface comps were generated with Figma AI (image model `gpt-image-2.5-sunburst`, through the Figma MCP) and used as visual targets; the interface itself is hand-built HTML, CSS and JavaScript.
 - The team is responsible for the architecture, security, correctness and every claim above and can explain the graph model, the queries and the decisions.
 
-_Team: who did what_ (to be completed by the team before submission):
+Team: who did what
 
-- _name_: _role and contribution_
+- **Abijith Kumar Sinha**: picked Track 01 and signed off on the product idea and scope, set the interface direction (chose the "Stand By" design and its minimal-text rule), pushed for a real model behind the agent and an honest evaluation of it, set up the model keys and deployed the live demo, and reviewed the results at each step. The code was written with Claude Code under his direction, as disclosed above.
 
 ## Repository layout
 
