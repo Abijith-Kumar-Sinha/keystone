@@ -7,6 +7,7 @@ Public-deployment safety: base graphs are read-only (KEYSTONE_WRITABLE=sandbox);
 """
 import asyncio
 import hmac
+import ipaddress
 import json
 import os
 import re
@@ -31,36 +32,57 @@ WEB = Path(__file__).resolve().parent.parent / "web"
 SANDBOX_TTL = int(os.environ.get("SANDBOX_TTL", 3 * 3600))
 MAX_SANDBOXES = int(os.environ.get("MAX_SANDBOXES", 40))
 LLM_HOSTS = {"api.anthropic.com", "api.openai.com", "generativelanguage.googleapis.com", "api.groq.com", "openrouter.ai", "api.mistral.ai"}
-_sandboxes: dict[str, float] = {}
-_hits: dict[tuple, deque] = defaultdict(deque)
+_sandboxes: dict[str, float] = {}               # name -> when it was last used (it is deleted after SANDBOX_TTL idle seconds)
+_owner: dict[str, str] = {}                      # name -> the client that started it
+_hits: dict[tuple, deque] = {}                   # (client or "*", bucket) -> recent request times
+MAX_PER_CLIENT = int(os.environ.get("MAX_SANDBOXES_PER_CLIENT", 4))
 
 
 TRUSTED_PROXIES = int(os.environ.get("KEYSTONE_TRUSTED_PROXIES", 1))   # reverse proxies in front of the app (Render, Hugging Face: 1; none: 0)
 
 
+def _internal(host: str) -> bool:
+    try:
+        ip = ipaddress.ip_address(host)
+    except ValueError:
+        return False
+    return ip.is_private or ip.is_loopback or ip.is_link_local
+
+
 def client_ip(request: Request) -> str:
-    """The caller's address. Each trusted proxy appends the peer it saw to X-Forwarded-For, so the entry that many hops from the right is the
-    one our own infrastructure recorded; entries to its left are whatever the client chose to send, and are ignored."""
-    hops = [h.strip() for h in (request.headers.get("x-forwarded-for") or "").split(",") if h.strip()]
-    if TRUSTED_PROXIES and len(hops) >= TRUSTED_PROXIES:
-        return hops[-TRUSTED_PROXIES]
-    return request.client.host if request.client else "?"
+    """The caller's address. X-Forwarded-For is believed only when the socket peer is our own proxy (a private or loopback address): someone
+    connecting directly could write anything in it. Each trusted proxy appends the peer it saw, so the entry that many hops from the right is
+    the one our own infrastructure recorded; entries to its left are whatever the client chose to send, and are ignored."""
+    peer = request.client.host if request.client else "?"
+    if TRUSTED_PROXIES and _internal(peer):
+        hops = [h.strip() for h in (request.headers.get("x-forwarded-for") or "").split(",") if h.strip()]
+        if len(hops) >= TRUSTED_PROXIES:
+            return hops[-TRUSTED_PROXIES]
+    return peer
+
+
+def _recent(key: tuple, now: float, per: int):
+    q = _hits.get(key)
+    while q and q[0] < now - per:
+        q.popleft()
+    return q
 
 
 def limited(request: Request, bucket: str, n: int, per: int = 60, total: int | None = None) -> None:
-    """At most n requests per client and `total` across everyone in `per` seconds, so a forged address cannot lift the global cap."""
-    now = time.time()
-    for key, cap in ((client_ip(request), n), ("*", total)):
+    """At most n requests per client and `total` across everyone in `per` seconds. The global cap is checked first and a refused request leaves
+    no trace, so a flood of forged addresses can neither lift the cap nor grow this table."""
+    now, me = time.time(), client_ip(request)
+    for key, cap in (("*", total), (me, n)):
         if cap is None:
             continue
-        q = _hits[(key, bucket)]
-        while q and q[0] < now - per:
-            q.popleft()
-        if len(q) >= cap:
+        q = _recent((key, bucket), now, per)
+        if q is not None and len(q) >= cap:
             raise HTTPException(429, f"Slow down: max {cap} {bucket} requests per {per}s{' for everyone' if key == '*' else ''}.")
-    for key in (client_ip(request), "*"):
-        _hits[(key, bucket)].append(now)
-
+    if len(_hits) > 4096:                              # forget clients whose window has emptied
+        for k in [k for k in list(_hits) if not _recent(k, now, per)]:
+            _hits.pop(k, None)
+    for key in (me, "*"):
+        _hits.setdefault((key, bucket), deque()).append(now)
 
 class Limit:
     """Pure ASGI wrapper (it must not buffer the streamed MCP responses) that rate-limits everything under a mount."""
@@ -77,12 +99,14 @@ class Limit:
                 return
         await self.app(scope, receive, send)
 
+
 def drop_sandbox(name: str) -> None:
     try:
         db.client().connection.execute_command("GRAPH.DELETE", db.PREFIX + name)
     except Exception:
         pass
     _sandboxes.pop(name, None)
+    _owner.pop(name, None)
 
 
 def sweep() -> None:
@@ -119,6 +143,8 @@ app.mount("/mcp", Limit(mcp_app, "mcp", 60, 240))
 def tenant_or_404(t: str) -> str:
     if not db.TENANT_RE.match(t or "") or not db.exists(t):
         raise HTTPException(404, f"unknown graph '{t}'")
+    if t in _sandboxes:
+        _sandboxes[t] = time.time()                     # in use: it is the last to be evicted and its idle clock restarts
     return t
 
 
@@ -178,17 +204,21 @@ def sandbox(body: Sandbox, request: Request):
     if base.startswith("try-"):
         raise HTTPException(400, "fork a base graph, not a sandbox")
     sweep()
+    me = client_ip(request)
+    mine = [n for n in _sandboxes if _owner.get(n) == me]
+    if len(mine) >= MAX_PER_CLIENT:                      # a client replaces its own least recently used sandbox; it can never push out someone else's
+        drop_sandbox(min(mine, key=_sandboxes.get))
     while len(_sandboxes) >= MAX_SANDBOXES:
-        oldest = min(_sandboxes, key=_sandboxes.get)
-        if time.time() - _sandboxes[oldest] < 120:       # never evict a sandbox someone started in the last two minutes
+        idlest = min(_sandboxes, key=_sandboxes.get)
+        if time.time() - _sandboxes[idlest] < 120:       # every sandbox was used in the last two minutes: refuse rather than cut anyone off
             raise HTTPException(503, "All sandboxes are in use. Try again in a minute.")
-        drop_sandbox(oldest)
+        drop_sandbox(idlest)
     name = f"try-{secrets.token_hex(12)}"                # 96 random bits: the name is the capability, and it is never listed anywhere
     try:
         db.client().connection.execute_command("GRAPH.COPY", db.PREFIX + base, db.PREFIX + name)
     except Exception as e:                               # FalkorDB forks to copy a graph: under memory pressure that can fail, and the visitor should just retry
         raise HTTPException(503, "The server is busy copying graphs. Try again in a few seconds.") from e
-    _sandboxes[name] = time.time()
+    _sandboxes[name], _owner[name] = time.time(), me
     return {"tenant": name, "base": base, "ttl_seconds": SANDBOX_TTL}
 
 

@@ -11,7 +11,7 @@ services:
       - key: KEYSTONE_WRITABLE          # base graphs read-only; every visitor gets a private GRAPH.COPY sandbox
         value: sandbox
       - key: MAX_SANDBOXES
-        value: "12"
+        value: "20"
       - key: LLM_BASE_URL               # primary model: Google Gemini
         value: https://generativelanguage.googleapis.com/v1beta/openai/
       - key: KEYSTONE_MODEL

@@ -29,8 +29,10 @@ Public deployments set `KEYSTONE_WRITABLE=sandbox` (already the image default): 
 | Variable | Default | What it does |
 |---|---|---|
 | `KEYSTONE_WRITABLE` | `sandbox` in the image | Base graphs are read-only; only a visitor's private sandbox accepts writes. |
-| `MAX_SANDBOXES` | 40 (12 in `render.yaml`) | How many sandboxes exist at once. A sandbox younger than two minutes is never evicted; a full server answers 503 "busy". |
-| `KEYSTONE_TRUSTED_PROXIES` | 1 | How many reverse proxies sit in front of the app. The client address is the `X-Forwarded-For` entry that many hops from the right, which a client cannot forge. Use 0 with no proxy. |
+| `MAX_SANDBOXES` | 40 (20 in `render.yaml`) | How many sandboxes exist at once. If every one was used in the last two minutes a new one is refused with 503 "busy"; otherwise the least recently used is replaced. |
+| `MAX_SANDBOXES_PER_CLIENT` | 4 | One client replaces its own least recently used sandbox after this many; it can never push out someone else's. |
+| `SANDBOX_TTL` | 10800 | Seconds a sandbox may sit idle before it is deleted. |
+| `KEYSTONE_TRUSTED_PROXIES` | 1 | How many reverse proxies sit in front of the app. The client address is the `X-Forwarded-For` entry that many hops from the right, which a client cannot forge, and the header is believed only when the connection comes from a private address (your proxy). Use 0 with no proxy. |
 | `KEYSTONE_ADMIN_TOKEN` | unset | Needed (as the `x-admin-token` header) to post a drafted issue as a real GitHub issue, and only when `KEYSTONE_GH_REPO` and `GITHUB_TOKEN` are also set. Leave all three unset on a public demo. |
 
 Rate limits apply per client and across everyone, to the API and to `/mcp`.

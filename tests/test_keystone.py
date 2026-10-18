@@ -241,11 +241,12 @@ def test_client_address_ignores_what_the_client_forges_and_the_global_cap_holds(
     from starlette.requests import Request
     from keystone import api
 
-    def req(xff):
-        return Request({"type": "http", "headers": [(b"x-forwarded-for", xff.encode())] if xff else [], "client": ("10.0.0.9", 1234), "method": "GET", "path": "/"})
+    def req(xff, peer="10.0.0.9"):
+        return Request({"type": "http", "headers": [(b"x-forwarded-for", xff.encode())] if xff else [], "client": (peer, 1234), "method": "GET", "path": "/"})
     monkeypatch.setattr(api, "TRUSTED_PROXIES", 1)
     assert api.client_ip(req("6.6.6.6, 1.2.3.4")) == "1.2.3.4"                       # the entry our own proxy appended, not the forged one
     assert api.client_ip(req(None)) == "10.0.0.9"
+    assert api.client_ip(req("6.6.6.6", peer="8.8.8.8")) == "8.8.8.8"                # a direct connection from the internet: the header is just text
     monkeypatch.setattr(api, "TRUSTED_PROXIES", 0)
     assert api.client_ip(req("6.6.6.6, 1.2.3.4")) == "10.0.0.9"
     monkeypatch.setattr(api, "TRUSTED_PROXIES", 1)
@@ -254,6 +255,20 @@ def test_client_address_ignores_what_the_client_forges_and_the_global_cap_holds(
         for i in range(10):
             api.limited(req(f"9.9.9.{i}, 7.7.7.{i}"), "capcheck", 100, total=5)
     assert e.value.status_code == 429 and "for everyone" in e.value.detail
+    assert ("7.7.7.5", "capcheck") not in api._hits and len(api._hits) <= 6          # the refused requests left no entries behind
+
+
+def test_one_client_cannot_crowd_out_the_others_sandboxes(client, monkeypatch):
+    from keystone import api
+    api._hits.clear()
+    monkeypatch.setattr(api, "MAX_PER_CLIENT", 2)
+    made = [client.post("/api/sandbox", json={"base": T}).json()["tenant"] for _ in range(3)]
+    try:
+        assert not db.exists(made[0]) and db.exists(made[1]) and db.exists(made[2])    # it replaced its own oldest, nobody else's
+        assert sum(1 for n in api._sandboxes if api._owner.get(n) == api._owner[made[2]]) == 2
+    finally:
+        for n in made:
+            api.drop_sandbox(n)
 
 
 def test_mcp_mount_is_rate_limited(client):
