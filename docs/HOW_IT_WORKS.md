@@ -35,7 +35,7 @@ Definitions to say out loud: knowledge = authored 1.0 or reviewed 0.4, times the
 
 - **Why a graph?** The question is a path: author, PR, module, reviewer. A counterfactual needs a copy you can edit; `GRAPH.COPY` makes that cheap (113 ms median here).
 - **What if there is no LLM?** The router answers; the UI says so. A visitor can paste their own key (kept in the tab, sent only with the request, host allowlist on the server).
-- **Is it really an agent, or keyword matching?** With a model, the model reads the 15 tool descriptions and chooses (up to six rounds), and we score it with `bench/agent_eval.py`. Without a key, a deterministic router answers: 65% of unseen phrasings routed correctly, 100% grounded. Say that plainly; the model path is the agent, the router is the safety net.
+- **Is it really an agent, or keyword matching?** With a model, the model reads the 15 tool descriptions and chooses (up to six rounds), and we score it with `bench/agent_eval.py`. On 20 questions nobody had tuned anything for, Gemini and Groq each chose the right tool 85% of the time, the keyword router 65%, and every row was 100% grounded (no name the tools did not return). Say that plainly: the model path is the agent, the router is the safety net.
 - **Does it hallucinate?** The model only chooses tools. Names in its prose must appear in the tool rows or the prose is discarded.
 - **Is it better than a simple rule?** On picks, no: "most active" also scores 95% in these small teams, and the README says so. The graph adds the proof, the what-if and the checked plan.
 - **Is the data real?** Yes: merged PRs of public repos (FalkorDB, Pallets). Only public GitHub logins; no emails.

@@ -155,18 +155,26 @@ Latency on the real FalkorDB snapshot (3,664 PRs, 62 people, 114 tracked modules
 
 ### Evaluating the agent itself
 
-`bench/agent_eval.py` asks the agent real questions about the FalkorDB graph and scores three things per question: **tools** (every tool we expect was called; with no expected tool, none may be called), **outcome** (`answered`, `from_memory`, `not_in_graph` or `unknown_entity` is the right one) and **grounded** (every person named in the answer is in the tool rows). Each question runs in its own `GRAPH.COPY` sandbox. Three sets keep the numbers honest:
+`bench/agent_eval.py` asks the agent real questions about the FalkorDB graph and scores three things per question: **tools** (every tool we expect was called; with no expected tool, none may be called), **outcome** (`answered`, `from_memory`, `not_in_graph` or `unknown_entity` is the right one) and **grounded** (every person named in the answer is in the tool rows). Each question runs in its own `GRAPH.COPY` sandbox, and a model is scored on its own answer, not on the router's rescue. The question sets:
 
-| Set | Questions | Tools | Outcome | Grounded | What it is |
-|---|---|---|---|---|---|
-| `dev` | 27 | 100% | 100% | 100% | the questions the router was built against, so a regression test and not a result |
-| `heldout` | 26 | 100% | 100% | 100% | first run was **62%** tools; fixing the gaps it exposed lifted it, so it is no longer unseen |
-| `fresh` | 20 | **65%** | **85%** | 100% | written after those fixes and never used to change the router: its real generalisation |
+- `dev` (27): the questions the router was built against, so a regression test and not a result.
+- `heldout` (26): the router first scored **62%** on tools; fixing the gaps it exposed lifted it, so it is no longer unseen.
+- `fresh` (20): written after those fixes and never used to change the router or the prompt at the time it was run. This is the one to read.
 
-Router rows (`python -m bench.agent_eval --set fresh`). Read the `fresh` row as the truth about the no-key fallback: it routes everyday wording correctly about two times in three and never names a person the tools did not return. That is why the product is built around a model choosing the tools. With a key (or Ollama) set, run `python -m bench.agent_eval --llm` to score the model on the same questions; the model sees the 15 tool descriptions and nothing else, and its prose is discarded if it names anyone the tools did not return.
+| Agent | Set | Scored | Tools | Outcome | Grounded | Median per question |
+|---|---|---|---|---|---|---|
+| Keyword router (no key) | dev | 27 | 100% | 100% | 100% | 30 ms |
+| Keyword router (no key) | heldout | 26 | 100% | 100% | 100% | 33 ms |
+| Keyword router (no key) | **fresh** | 20 | **65%** | **85%** | 100% | 34 ms |
+| Gemini 3.5 Flash-Lite | dev | 27 | 96% | 100% | 100% | 4.0 s |
+| Gemini 3.5 Flash-Lite | **fresh** | 20 | **85%** | **95%** | 100% | 3.4 s |
+| Groq gpt-oss-120b | dev | 26 of 27 (one provider error left out) | 100% | 100% | 100% | 2.5 s |
+| Groq gpt-oss-120b | **fresh** | 20 | **85%** | **95%** | 100% | 2.6 s |
+| Qwen3-VL 8B on a laptop GPU (Ollama) | dev | 27 | 93% | 100% | 100% | 94 s |
 
-The real model path is also covered by tests that need no key (`FakeModel` in `tests/test_keystone.py`): tool calls go through MCP, the model can never choose a tenant, ungrounded prose is discarded, and an empty, slow, failing or tool-less model falls back to the router without leaking the key.
+What this says. A model picks the right tool for about 85 of 100 unseen questions where the keyword router manages 65, and nobody's answer ever named a person the tools did not return. The misses are the interesting kind: both models read "what did the last review say" as `recall` rather than `changes_since`, one asked `overview` for "who is the CEO" where it should have declined, and Gemini answered "keep in mind that barakb is moving" by running the planning and drafting tools instead of noting it. That last one made us add a rule to the system prompt (write tools only when the user asks for a plan, drafts or a note), so the `fresh` set is no longer unseen for the prompt; the numbers above are from before that change. Results per run are in `bench/agent_eval_*.json`; rerun with `python -m bench.agent_eval --llm --set fresh` (add `--which backup` for the second model).
 
+The real model path is also covered by tests that need no key (`FakeModel` in `tests/test_keystone.py`): tool calls go through MCP, the model can never choose a tenant, ungrounded prose is discarded, and an empty, slow, failing or tool-less model falls back to the backup model and then the router without leaking a key.
 ## Safety, privacy and limits
 
 - Public data only: merged pull requests of public repositories. GitHub logins appear (they are public); email addresses are never requested or stored.
