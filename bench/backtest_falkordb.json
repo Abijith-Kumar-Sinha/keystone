@@ -1,0 +1,459 @@
+{
+ "summary": {
+  "tenant": "falkordb",
+  "t0": "2026-04-15",
+  "t1": "2026-10-15",
+  "k": 3,
+  "cases": 19,
+  "active_at_t0": 21,
+  "graph": [
+   0.947,
+   0.526
+  ],
+  "deputy": [
+   0.947,
+   0.544
+  ],
+  "prolific": [
+   0.947,
+   0.614
+  ],
+  "random_hit": 0.386
+ },
+ "cases": [
+  {
+   "module": "FalkorDB:src/commands",
+   "holder": "swilly22",
+   "truth": [
+    "AviAvni",
+    "DvirDukhan",
+    "GomezGab"
+   ],
+   "graph": [
+    "AviAvni",
+    "barakb",
+    "GomezGab"
+   ],
+   "deputy": [
+    "AviAvni",
+    "barakb",
+    "GomezGab"
+   ],
+   "prolific": [
+    "gkorland",
+    "dudizimber",
+    "AviAvni"
+   ]
+  },
+  {
+   "module": "FalkorDB:src/graph",
+   "holder": "swilly22",
+   "truth": [
+    "GomezGab",
+    "DvirDukhan",
+    "gkorland"
+   ],
+   "graph": [
+    "AviAvni",
+    "GomezGab",
+    "barakb"
+   ],
+   "deputy": [
+    "GomezGab",
+    "gkorland",
+    "AviAvni"
+   ],
+   "prolific": [
+    "gkorland",
+    "dudizimber",
+    "AviAvni"
+   ]
+  },
+  {
+   "module": "QueryWeaver:app",
+   "holder": "gkorland",
+   "truth": [
+    "barakb",
+    "Naseem77",
+    "galshubeli"
+   ],
+   "graph": [
+    "galshubeli",
+    "Anchel123",
+    "Naseem77"
+   ],
+   "deputy": [
+    "Anchel123",
+    "Naseem77",
+    "shahar-biron"
+   ],
+   "prolific": [
+    "galshubeli",
+    "Naseem77",
+    "danshalev7"
+   ]
+  },
+  {
+   "module": "text-to-cypher:src",
+   "holder": "barakb",
+   "truth": [
+    "Naseem77"
+   ],
+   "graph": [
+    "Naseem77",
+    "gkorland"
+   ],
+   "deputy": [
+    "Naseem77",
+    "gkorland"
+   ],
+   "prolific": [
+    "Naseem77",
+    "gkorland",
+    "danshalev7"
+   ]
+  },
+  {
+   "module": "falkordb-browser:app/components",
+   "holder": "Anchel123",
+   "truth": [
+    "shahar-biron",
+    "barakb",
+    "Naseem77"
+   ],
+   "graph": [
+    "barakb",
+    "AviAvni",
+    "shahar-biron"
+   ],
+   "deputy": [
+    "barakb",
+    "shahar-biron",
+    "Naseem77"
+   ],
+   "prolific": [
+    "barakb",
+    "Naseem77",
+    "shahar-biron"
+   ]
+  },
+  {
+   "module": "falkordb-browser:app/api",
+   "holder": "Anchel123",
+   "truth": [
+    "shahar-biron",
+    "barakb",
+    "Naseem77"
+   ],
+   "graph": [
+    "barakb",
+    "Naseem77",
+    "AviAvni"
+   ],
+   "deputy": [
+    "barakb",
+    "Naseem77",
+    "gkorland"
+   ],
+   "prolific": [
+    "barakb",
+    "Naseem77",
+    "shahar-biron"
+   ]
+  },
+  {
+   "module": "QueryWeaver:api",
+   "holder": "gkorland",
+   "truth": [
+    "galshubeli",
+    "barakb",
+    "Naseem77"
+   ],
+   "graph": [
+    "galshubeli",
+    "Naseem77",
+    "Anchel123"
+   ],
+   "deputy": [
+    "galshubeli",
+    "Naseem77",
+    "shahar-biron"
+   ],
+   "prolific": [
+    "galshubeli",
+    "Naseem77",
+    "danshalev7"
+   ]
+  },
+  {
+   "module": "QueryWeaver:.github",
+   "holder": "gkorland",
+   "truth": [
+    "barakb",
+    "galshubeli",
+    "Naseem77"
+   ],
+   "graph": [
+    "galshubeli",
+    "Naseem77",
+    "Anchel123"
+   ],
+   "deputy": [
+    "galshubeli",
+    "Naseem77",
+    "danshalev7"
+   ],
+   "prolific": [
+    "galshubeli",
+    "Naseem77",
+    "danshalev7"
+   ]
+  },
+  {
+   "module": "FalkorDB:src",
+   "holder": "swilly22",
+   "truth": [
+    "AviAvni",
+    "DvirDukhan",
+    "dudizimber"
+   ],
+   "graph": [
+    "AviAvni",
+    "gkorland",
+    "GomezGab"
+   ],
+   "deputy": [
+    "gkorland",
+    "AviAvni",
+    "GomezGab"
+   ],
+   "prolific": [
+    "gkorland",
+    "dudizimber",
+    "AviAvni"
+   ]
+  },
+  {
+   "module": "falkordb-ts:.github",
+   "holder": "gkorland",
+   "truth": [
+    "barakb",
+    "Anchel123",
+    "Naseem77"
+   ],
+   "graph": [
+    "barakb",
+    "Naseem77",
+    "MuhammadQadora"
+   ],
+   "deputy": [
+    "barakb",
+    "Anchel123",
+    "dudizimber"
+   ],
+   "prolific": [
+    "barakb",
+    "Anchel123",
+    "Stradivario"
+   ]
+  },
+  {
+   "module": "falkordb-rs:.github",
+   "holder": "gkorland",
+   "truth": [
+    "barakb",
+    "DvirDukhan",
+    "Naseem77"
+   ],
+   "graph": [
+    "barakb",
+    "AviAvni"
+   ],
+   "deputy": [
+    "barakb",
+    "AviAvni"
+   ],
+   "prolific": [
+    "barakb"
+   ]
+  },
+  {
+   "module": "FalkorDB:src/serializers",
+   "holder": "swilly22",
+   "truth": [
+    "DvirDukhan",
+    "gkorland",
+    "AviAvni"
+   ],
+   "graph": [
+    "GomezGab",
+    "AviAvni",
+    "gkorland"
+   ],
+   "deputy": [
+    "GomezGab",
+    "gkorland",
+    "AviAvni"
+   ],
+   "prolific": [
+    "gkorland",
+    "dudizimber",
+    "AviAvni"
+   ]
+  },
+  {
+   "module": "falkordb-browser:app/settings",
+   "holder": "Anchel123",
+   "truth": [
+    "shahar-biron",
+    "barakb",
+    "gkorland"
+   ],
+   "graph": [
+    "barakb",
+    "AviAvni",
+    "shahar-biron"
+   ],
+   "deputy": [
+    "barakb",
+    "Naseem77",
+    "shahar-biron"
+   ],
+   "prolific": [
+    "barakb",
+    "Naseem77",
+    "shahar-biron"
+   ]
+  },
+  {
+   "module": "GraphRAG-SDK:graphrag_sdk",
+   "holder": "galshubeli",
+   "truth": [
+    "Naseem77",
+    "gkorland",
+    "drr00t"
+   ],
+   "graph": [
+    "swilly22",
+    "gkorland",
+    "Naseem77"
+   ],
+   "deputy": [
+    "Naseem77",
+    "swilly22",
+    "aryan757"
+   ],
+   "prolific": [
+    "gkorland",
+    "Naseem77",
+    "dipanjannC"
+   ]
+  },
+  {
+   "module": "falkordb-browser:app/graph",
+   "holder": "Anchel123",
+   "truth": [
+    "shahar-biron",
+    "barakb",
+    "Naseem77"
+   ],
+   "graph": [
+    "barakb",
+    "gkorland",
+    "AviAvni"
+   ],
+   "deputy": [
+    "barakb",
+    "AviAvni",
+    "gkorland"
+   ],
+   "prolific": [
+    "barakb",
+    "Naseem77",
+    "shahar-biron"
+   ]
+  },
+  {
+   "module": "FalkorDB:src/execution_plan",
+   "holder": "swilly22",
+   "truth": [
+    "GomezGab",
+    "DvirDukhan",
+    "gkorland"
+   ],
+   "graph": [
+    "AviAvni",
+    "barakb",
+    "GomezGab"
+   ],
+   "deputy": [
+    "AviAvni",
+    "gkorland",
+    "barakb"
+   ],
+   "prolific": [
+    "gkorland",
+    "dudizimber",
+    "AviAvni"
+   ]
+  },
+  {
+   "module": "falkordb-browser:app",
+   "holder": "Anchel123",
+   "truth": [
+    "barakb",
+    "shahar-biron",
+    "dudizimber"
+   ],
+   "graph": [
+    "barakb",
+    "shahar-biron",
+    "AviAvni"
+   ],
+   "deputy": [
+    "barakb",
+    "shahar-biron",
+    "gkorland"
+   ],
+   "prolific": [
+    "barakb",
+    "Naseem77",
+    "shahar-biron"
+   ]
+  },
+  {
+   "module": "FalkorDB-MCPServer:.github",
+   "holder": "gkorland",
+   "truth": [
+    "barakb"
+   ],
+   "graph": [],
+   "deputy": [],
+   "prolific": []
+  },
+  {
+   "module": "falkordb-browser:lib",
+   "holder": "Anchel123",
+   "truth": [
+    "shahar-biron",
+    "barakb",
+    "Naseem77"
+   ],
+   "graph": [
+    "barakb",
+    "shahar-biron",
+    "AviAvni"
+   ],
+   "deputy": [
+    "barakb",
+    "Naseem77",
+    "shahar-biron"
+   ],
+   "prolific": [
+    "barakb",
+    "Naseem77",
+    "shahar-biron"
+   ]
+  }
+ ]
+}

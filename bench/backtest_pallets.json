@@ -1,0 +1,72 @@
+{
+ "summary": {
+  "tenant": "pallets",
+  "t0": "2026-01-15",
+  "t1": "2026-10-17",
+  "k": 3,
+  "cases": 2,
+  "active_at_t0": 49,
+  "graph": [
+   1.0,
+   0.5
+  ],
+  "deputy": [
+   1.0,
+   0.5
+  ],
+  "prolific": [
+   1.0,
+   0.5
+  ],
+  "random_hit": 0.176
+ },
+ "cases": [
+  {
+   "module": "werkzeug:src/werkzeug",
+   "holder": "davidism",
+   "truth": [
+    "pgjones",
+    "tahme",
+    "ThiefMaster"
+   ],
+   "graph": [
+    "pgjones",
+    "cclauss",
+    "isidroas"
+   ],
+   "deputy": [
+    "pgjones",
+    "mldangelo",
+    "TomiBelan"
+   ],
+   "prolific": [
+    "cclauss",
+    "pgjones",
+    "TomiBelan"
+   ]
+  },
+  {
+   "module": "click:.github",
+   "holder": "Rowlando13",
+   "truth": [
+    "kdeldycke",
+    "davidism",
+    "pjonsson"
+   ],
+   "graph": [
+    "davidism",
+    "kdeldycke",
+    "denuoweb"
+   ],
+   "deputy": [
+    "davidism",
+    "kdeldycke"
+   ],
+   "prolific": [
+    "kdeldycke",
+    "denuoweb",
+    "davidism"
+   ]
+  }
+ ]
+}

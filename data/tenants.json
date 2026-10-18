@@ -1,0 +1,11 @@
+{
+  "falkordb": {
+    "label": "FalkorDB (12 public repositories)",
+    "files": ["FalkorDB__*.json.gz"],
+    "history": {"as_of": "2026-04-15", "reviews": ["swilly22", "Anchel123"]}
+  },
+  "pallets": {
+    "label": "Pallets (Flask and friends)",
+    "files": ["pallets__*.json.gz"]
+  }
+}

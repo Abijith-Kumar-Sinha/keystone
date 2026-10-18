@@ -1,0 +1,19 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+.pytest_cache/
+data/raw/
+data/fixtures/*.tmp
+data/*.log
+*.stale
+node_modules/
+.claude/
+
+# design process: keep PRODUCT.md, DESIGN.md, the surface briefs and design.json; the bulky working files stay local
+.impeccable/mocks/
+.impeccable/review/
+.impeccable/build/
+.impeccable/build-old-console/
+.impeccable/questions/
+.impeccable/decision-payload*.json

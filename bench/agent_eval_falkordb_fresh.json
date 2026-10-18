@@ -1,0 +1,353 @@
+{
+ "tenant": "falkordb",
+ "set": "fresh",
+ "results": [
+  {
+   "summary": {
+    "mode": "router",
+    "cases": 20,
+    "tool_selection_pct": 65,
+    "outcome_pct": 85,
+    "grounded_pct": 100,
+    "all_three_pct": 65,
+    "median_ms": 34,
+    "extra_tool_calls": 1,
+    "model_prose_discarded": 0,
+    "fell_back_to_router": 0
+   },
+   "cases": [
+    {
+     "q": "Hypothetically, what would we lose if swilly22 left the company?",
+     "expected": [
+      "what_if_leaves"
+     ],
+     "called": [
+      "what_if_leaves"
+     ],
+     "outcome": "answered",
+     "mode": "scripted",
+     "tools_ok": true,
+     "outcome_ok": true,
+     "grounded": true,
+     "notes": [],
+     "ms": 260,
+     "answer": "If swilly22 left: 0 modules orphaned, 23 fragile. Worst first: FalkorDB:src/execution_plan (fragile, swilly22 holds 56%); FalkorDB:deps (fragile, swilly22 holds 49%); FalkorDB:src/arithmetic (fragile, swilly22 holds 62%); FalkorDB:src/graph (fragile, swilly22 holds 55%)."
+    },
+    {
+     "q": "What is the damage if Naseem77 takes a long vacation?",
+     "expected": [
+      "what_if_leaves"
+     ],
+     "called": [
+      "what_if_leaves"
+     ],
+     "outcome": "answered",
+     "mode": "scripted",
+     "tools_ok": true,
+     "outcome_ok": true,
+     "grounded": true,
+     "notes": [],
+     "ms": 265,
+     "answer": "If Naseem77 left: 0 modules orphaned, 4 fragile. Worst first: QueryWeaver:api (fragile, Naseem77 holds 9%); text-to-cypher:templates (fragile, Naseem77 holds 66%); text-to-cypher:src/schema (fragile, Naseem77 holds 59%); falkordb-browser:lib/token-storage (fragile, Naseem77 holds 45%)."
+    },
+    {
+     "q": "Can you tell me who could take over from DvirDukhan?",
+     "expected": [
+      "successors"
+     ],
+     "called": [
+      "successors"
+     ],
+     "outcome": "answered",
+     "mode": "scripted",
+     "tools_ok": true,
+     "outcome_ok": true,
+     "grounded": true,
+     "notes": [],
+     "ms": 136,
+     "answer": "Best successors for DvirDukhan: AviAvni (reviewed 32 of their PRs, adjacent via code-graph:e2e); swilly22 (reviewed 6 of their PRs, adjacent via code-graph:e2e); galshubeli (reviewed 16 of their PRs, adjacent via code-graph:tests)."
+    },
+    {
+     "q": "Which team members are most critical?",
+     "expected": [
+      "keystones"
+     ],
+     "called": [
+      "risk_scan"
+     ],
+     "outcome": "answered",
+     "mode": "scripted",
+     "tools_ok": false,
+     "outcome_ok": true,
+     "grounded": true,
+     "notes": [],
+     "ms": 35,
+     "answer": "Of 114 tracked modules: 21 critical, 63 high, 29 medium, 1 low. Most exposed: falkordb-browser:app (Anchel123 63%); FalkorDB:src/execution_plan (swilly22 56%); falkordb-browser:app/api (Anchel123 55%); falkordb-browser:app/components (Anchel123 65%)."
+    },
+    {
+     "q": "Who should I worry about losing first?",
+     "expected": [
+      "keystones"
+     ],
+     "called": [
+      "keystones"
+     ],
+     "outcome": "answered",
+     "mode": "scripted",
+     "tools_ok": true,
+     "outcome_ok": true,
+     "grounded": true,
+     "notes": [],
+     "ms": 21,
+     "answer": "People whose departure hurts most: gkorland (would orphan 12, sole holder of 10); barakb (would orphan 8, sole holder of 6); swilly22 (would orphan 0, sole holder of 20); Anchel123 (would orphan 0, sole holder of 15)."
+    },
+    {
+     "q": "Is the FalkorDB core engine well covered?",
+     "expected": [
+      "module_risk"
+     ],
+     "called": [],
+     "outcome": "not_in_graph",
+     "mode": "scripted",
+     "tools_ok": false,
+     "outcome_ok": true,
+     "grounded": true,
+     "notes": [],
+     "ms": 10,
+     "answer": "That is outside this graph. I can answer who holds the knowledge of a codebase, what breaks if someone leaves, who could step in, and what to do about it."
+    },
+    {
+     "q": "How safe is the code-graph app?",
+     "expected": [
+      "module_risk"
+     ],
+     "called": [
+      "module_risk"
+     ],
+     "outcome": "answered",
+     "mode": "scripted",
+     "tools_ok": true,
+     "outcome_ok": true,
+     "grounded": true,
+     "notes": [],
+     "ms": 51,
+     "answer": "code-graph:app is **high** risk: bus factor 1 among active people. gkorland holds 50% (authored 13, reviewed 5); active people hold 90% of the module's knowledge."
+    },
+    {
+     "q": "Who built the text-to-cypher module?",
+     "expected": [
+      "who_knows"
+     ],
+     "called": [
+      "who_knows"
+     ],
+     "outcome": "answered",
+     "mode": "scripted",
+     "tools_ok": true,
+     "outcome_ok": true,
+     "grounded": true,
+     "notes": [],
+     "ms": 32,
+     "answer": "Knowledge of text-to-cypher:.github: barakb 85%; gkorland 8%; Naseem77 6%; galshubeli 1%."
+    },
+    {
+     "q": "who knows the vector index stuff",
+     "expected": [
+      "who_knows"
+     ],
+     "called": [
+      "who_knows"
+     ],
+     "outcome": "not_in_graph",
+     "mode": "scripted",
+     "tools_ok": true,
+     "outcome_ok": true,
+     "grounded": true,
+     "notes": [],
+     "ms": 25,
+     "answer": "Nothing in this graph is about 'vector index stuff'. The graph only knows code and CI areas of the indexed repos."
+    },
+    {
+     "q": "Any experts on the slow log?",
+     "expected": [
+      "who_knows"
+     ],
+     "called": [],
+     "outcome": "not_in_graph",
+     "mode": "scripted",
+     "tools_ok": false,
+     "outcome_ok": false,
+     "grounded": true,
+     "notes": [],
+     "ms": 9,
+     "answer": "That is outside this graph. I can answer who holds the knowledge of a codebase, what breaks if someone leaves, who could step in, and what to do about it."
+    },
+    {
+     "q": "How does gkorland connect to AviAvni?",
+     "expected": [
+      "path_between"
+     ],
+     "called": [
+      "path_between"
+     ],
+     "outcome": "answered",
+     "mode": "scripted",
+     "tools_ok": true,
+     "outcome_ok": true,
+     "grounded": true,
+     "notes": [],
+     "ms": 24,
+     "answer": "Shared-knowledge chain: gkorland -> falkordblite:.github -> AviAvni."
+    },
+    {
+     "q": "Is there a relationship between Anchel123 and barakb?",
+     "expected": [
+      "path_between"
+     ],
+     "called": [
+      "path_between"
+     ],
+     "outcome": "answered",
+     "mode": "scripted",
+     "tools_ok": true,
+     "outcome_ok": true,
+     "grounded": true,
+     "notes": [],
+     "ms": 19,
+     "answer": "Shared-knowledge chain: Anchel123 -> falkordb-browser:app/lib -> barakb."
+    },
+    {
+     "q": "What did the last review say?",
+     "expected": [
+      "changes_since"
+     ],
+     "called": [
+      "changes_since"
+     ],
+     "outcome": "from_memory",
+     "mode": "scripted",
+     "tools_ok": true,
+     "outcome_ok": true,
+     "grounded": true,
+     "notes": [],
+     "ms": 106,
+     "answer": "Since the review as of 2026-04-15: 8 modules safer, 7 riskier, 8 changed top holder. Pairing tasks: AviAvni on FalkorDB:src: in progress (11%->22%); AviAvni on FalkorDB:src/commands: in progress (14%->31%); AviAvni on FalkorDB:src/arithmetic: not started (19%->13%)."
+    },
+    {
+     "q": "Anything we noted about Anchel123 before?",
+     "expected": [
+      "recall"
+     ],
+     "called": [
+      "what_if_leaves"
+     ],
+     "outcome": "answered",
+     "mode": "scripted",
+     "tools_ok": false,
+     "outcome_ok": false,
+     "grounded": true,
+     "notes": [],
+     "ms": 245,
+     "answer": "If Anchel123 left: 0 modules orphaned, 21 fragile. Worst first: falkordb-browser:app (fragile, Anchel123 holds 63%); falkordb-browser:app/api (fragile, Anchel123 holds 55%); falkordb-browser:app/components (fragile, Anchel123 holds 65%); falkordb-browser:app/graph (fragile, Anchel123 holds 63%)."
+    },
+    {
+     "q": "Keep in mind that barakb is moving to another team in December",
+     "expected": [
+      "note_finding"
+     ],
+     "called": [
+      "what_if_leaves"
+     ],
+     "outcome": "answered",
+     "mode": "scripted",
+     "tools_ok": false,
+     "outcome_ok": true,
+     "grounded": true,
+     "notes": [],
+     "ms": 253,
+     "answer": "If barakb left: 8 modules orphaned, 8 fragile. Worst first: falkordb-rs:src (orphaned, barakb holds 90%); falkordb-rs:src/response (orphaned, barakb holds 60%); falkordb-rs:src/error (orphaned, barakb holds 89%); falkordb-rs:src/graph (orphaned, barakb holds 74%)."
+    },
+    {
+     "q": "Create a handoff plan for gkorland and draft the issues",
+     "expected": [
+      "succession_review",
+      "draft_actions"
+     ],
+     "called": [
+      "draft_actions"
+     ],
+     "outcome": "answered",
+     "mode": "scripted",
+     "tools_ok": false,
+     "outcome_ok": true,
+     "grounded": true,
+     "notes": [],
+     "ms": 133,
+     "answer": "Drafted 8 artifacts for decision d-f5b0a7e113: CODEOWNERS: add successors to 1 path(s); [succession] Pair @gkorland with @Anchel123 on code-graph:app/api; CODEOWNERS: add successors to 1 path(s). Dry run, nothing posted."
+    },
+    {
+     "q": "What is 2 + 2?",
+     "expected": [],
+     "called": [],
+     "outcome": "not_in_graph",
+     "mode": "scripted",
+     "tools_ok": true,
+     "outcome_ok": true,
+     "grounded": true,
+     "notes": [],
+     "ms": 7,
+     "answer": "That is outside this graph. I can answer who holds the knowledge of a codebase, what breaks if someone leaves, who could step in, and what to do about it."
+    },
+    {
+     "q": "Who is the CEO of FalkorDB?",
+     "expected": [],
+     "called": [
+      "risk_scan"
+     ],
+     "outcome": "answered",
+     "mode": "scripted",
+     "tools_ok": false,
+     "outcome_ok": false,
+     "grounded": true,
+     "notes": [],
+     "ms": 29,
+     "answer": "Of 114 tracked modules: 21 critical, 63 high, 29 medium, 1 low. Most exposed: falkordb-browser:app (Anchel123 63%); FalkorDB:src/execution_plan (swilly22 56%); falkordb-browser:app/api (Anchel123 55%); falkordb-browser:app/components (Anchel123 65%)."
+    },
+    {
+     "q": "What if ghost-user99 leaves?",
+     "expected": [
+      "what_if_leaves"
+     ],
+     "called": [
+      "what_if_leaves"
+     ],
+     "outcome": "unknown_entity",
+     "mode": "scripted",
+     "tools_ok": true,
+     "outcome_ok": true,
+     "grounded": true,
+     "notes": [],
+     "ms": 20,
+     "answer": "No person called 'ghost-user99' in this graph."
+    },
+    {
+     "q": "Which modules would be abandoned if everyone inactive stayed gone?",
+     "expected": [
+      "risk_scan"
+     ],
+     "called": [
+      "risk_scan"
+     ],
+     "outcome": "answered",
+     "mode": "scripted",
+     "tools_ok": true,
+     "outcome_ok": true,
+     "grounded": true,
+     "notes": [],
+     "ms": 37,
+     "answer": "Of 114 tracked modules: 21 critical, 63 high, 29 medium, 1 low. Most exposed: falkordb-browser:app (Anchel123 63%); FalkorDB:src/execution_plan (swilly22 56%); falkordb-browser:app/api (Anchel123 55%); falkordb-browser:app/components (Anchel123 65%)."
+    }
+   ]
+  }
+ ]
+}

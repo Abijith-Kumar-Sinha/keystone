@@ -1,0 +1,391 @@
+{
+ "tenant": "falkordb",
+ "set": "fresh",
+ "results": [
+  {
+   "summary": {
+    "mode": "model:gemini-3.5-flash-lite",
+    "cases": 20,
+    "scored": 20,
+    "excluded_provider_failures": 0,
+    "tool_selection_pct": 85,
+    "outcome_pct": 95,
+    "grounded_pct": 100,
+    "all_three_pct": 85,
+    "median_ms": 3376,
+    "extra_tool_calls": 10,
+    "model_prose_discarded": 0,
+    "fell_back_to_router": 1
+   },
+   "cases": [
+    {
+     "q": "Hypothetically, what would we lose if swilly22 left the company?",
+     "expected": [
+      "what_if_leaves"
+     ],
+     "called": [
+      "what_if_leaves"
+     ],
+     "outcome": "answered",
+     "mode": "llm",
+     "tools_ok": true,
+     "outcome_ok": true,
+     "grounded": true,
+     "excluded": false,
+     "notes": [],
+     "ms": 3351,
+     "answer": "If @swilly22 left, 0 modules would be orphaned, but 23 modules would become fragile across 54 touched modules.\n\n- Touches 54 modules with heavy knowledge share, such as `FalkorDB/FalkorDB:src/ast` (63.1%) and `FalkorDB/FalkorDB:src/arithmetic` (62.3%).\n- Leaves single-person bus factor areas like `F"
+    },
+    {
+     "q": "What is the damage if Naseem77 takes a long vacation?",
+     "expected": [
+      "what_if_leaves"
+     ],
+     "called": [
+      "what_if_leaves"
+     ],
+     "outcome": "answered",
+     "mode": "llm",
+     "tools_ok": true,
+     "outcome_ok": true,
+     "grounded": true,
+     "excluded": false,
+     "notes": [],
+     "ms": 3124,
+     "answer": "If @Naseem77 takes a long vacation, no modules are orphaned, but 4 modules become fragile across 50 touched modules.\n\n- **text-to-cypher:templates**: Becomes single-person dependent as @Naseem77 holds 66.4% of the knowledge.\n- **text-to-cypher:src/schema**: Drops to single-person coverage with @Nase"
+    },
+    {
+     "q": "Can you tell me who could take over from DvirDukhan?",
+     "expected": [
+      "successors"
+     ],
+     "called": [
+      "successors"
+     ],
+     "outcome": "answered",
+     "mode": "llm",
+     "tools_ok": true,
+     "outcome_ok": true,
+     "grounded": true,
+     "excluded": false,
+     "notes": [],
+     "ms": 2892,
+     "answer": "@AviAvni is the strongest successor for @DvirDukhan, followed by @swilly22 and @galshubeli.\n\n- **@AviAvni**: Score 0.926; reviewed 32 of their PRs and shares adjacent work in `code-graph:e2e`.\n- **@swilly22**: Score 0.688; reviewed 6 of their PRs with adjacent work in `code-graph:e2e`.\n- **@galshube"
+    },
+    {
+     "q": "Which team members are most critical?",
+     "expected": [
+      "keystones"
+     ],
+     "called": [
+      "keystones"
+     ],
+     "outcome": "answered",
+     "mode": "llm",
+     "tools_ok": true,
+     "outcome_ok": true,
+     "grounded": true,
+     "excluded": false,
+     "notes": [],
+     "ms": 3417,
+     "answer": "@gkorland and @barakb are our most critical single points of failure, carrying the highest risk weights and sole-holder counts.\n\n- **@gkorland** holds the highest risk weight (10.36), would orphan 12 modules if leaving, and is sole holder of 10 modules (including `docs:design`, `docs:agentic-memory`"
+    },
+    {
+     "q": "Who should I worry about losing first?",
+     "expected": [
+      "keystones"
+     ],
+     "called": [
+      "keystones"
+     ],
+     "outcome": "answered",
+     "mode": "llm",
+     "tools_ok": true,
+     "outcome_ok": true,
+     "grounded": true,
+     "excluded": false,
+     "notes": [],
+     "ms": 2656,
+     "answer": "You should worry about losing @gkorland first, followed by @barakb. Both carry the highest succession risk and single-point-of-failure metrics.\n\n- @gkorland has the highest risk weight (10.36), would orphan 12 modules, and is sole holder of 10 modules (including `docs:design`, `docs:agentic-memory`,"
+    },
+    {
+     "q": "Is the FalkorDB core engine well covered?",
+     "expected": [
+      "module_risk"
+     ],
+     "called": [
+      "find_modules",
+      "module_risk"
+     ],
+     "outcome": "answered",
+     "mode": "llm",
+     "tools_ok": true,
+     "outcome_ok": true,
+     "grounded": true,
+     "excluded": false,
+     "notes": [],
+     "ms": 3919,
+     "answer": "No, the FalkorDB core engine (`FalkorDB/FalkorDB:src`) carries medium risk with a bus factor of 2. \n\n- **Risk Tier:** Medium (importance 0.78, active cover 99.1%)\n- **Knowledge Distribution:** Shared primarily between @swilly22 (34.4% knowledge share) and @AviAvni (22.3% share).\n- **Active Contribut"
+    },
+    {
+     "q": "How safe is the code-graph app?",
+     "expected": [
+      "module_risk"
+     ],
+     "called": [
+      "find_modules",
+      "module_risk"
+     ],
+     "outcome": "answered",
+     "mode": "llm",
+     "tools_ok": true,
+     "outcome_ok": true,
+     "grounded": true,
+     "excluded": false,
+     "notes": [],
+     "ms": 4941,
+     "answer": "`FalkorDB/code-graph:app` is in the **high** risk tier with a bus factor of 2 (only 1 active).\n\n- **Knowledge concentration**: @gkorland holds 49.9% share (13 authored, 5 reviewed) and @Anchel123 holds 24.1% (14 authored, 1 reviewed).\n- **Active contributors**: Only @gkorland is active among the top"
+    },
+    {
+     "q": "Who built the text-to-cypher module?",
+     "expected": [
+      "who_knows"
+     ],
+     "called": [
+      "find_modules",
+      "who_knows"
+     ],
+     "outcome": "answered",
+     "mode": "llm",
+     "tools_ok": true,
+     "outcome_ok": true,
+     "grounded": true,
+     "excluded": false,
+     "notes": [],
+     "ms": 4267,
+     "answer": "@barakb and @Naseem77 built the core `FalkorDB/text-to-cypher:src` module.\n\n- @barakb holds 52.9% of the knowledge, having authored 12 PRs and reviewed 8.\n- @Naseem77 holds 45.9% of the knowledge, having authored 10 PRs.\n- @gkorland contributed minimally with 1.2% (1 authored PR)."
+    },
+    {
+     "q": "who knows the vector index stuff",
+     "expected": [
+      "who_knows"
+     ],
+     "called": [
+      "find_modules",
+      "who_knows",
+      "overview"
+     ],
+     "outcome": "answered",
+     "mode": "llm",
+     "tools_ok": true,
+     "outcome_ok": true,
+     "grounded": true,
+     "excluded": false,
+     "notes": [],
+     "ms": 5414,
+     "answer": "No one in the graph knows about vector indices; the repository data does not contain any matching topics or modules. \n\n- Graph overview: 114 modules across 3,664 PRs and 62 people.\n- Query search: Searching for \"vector\" or \"vector index\" returns `not_in_graph`."
+    },
+    {
+     "q": "Any experts on the slow log?",
+     "expected": [
+      "who_knows"
+     ],
+     "called": [
+      "find_modules",
+      "who_knows"
+     ],
+     "outcome": "answered",
+     "mode": "llm",
+     "tools_ok": true,
+     "outcome_ok": true,
+     "grounded": true,
+     "excluded": false,
+     "notes": [],
+     "ms": 4283,
+     "answer": "@swilly22 is the primary expert on `FalkorDB/FalkorDB:src/slow_log`, holding an 83.9% knowledge share (2 authored, 1 reviewed PR). @barakb and @GomezGab also have minor review involvement.\n\n- @swilly22: 83.9% share, 2 authored, 1 reviewed PR\n- @barakb: 13.1% share, 2 reviewed PRs\n- @GomezGab: 3.1% s"
+    },
+    {
+     "q": "How does gkorland connect to AviAvni?",
+     "expected": [
+      "path_between"
+     ],
+     "called": [
+      "path_between"
+     ],
+     "outcome": "answered",
+     "mode": "llm",
+     "tools_ok": true,
+     "outcome_ok": true,
+     "grounded": true,
+     "excluded": false,
+     "notes": [],
+     "ms": 2439,
+     "answer": "@gkorland is connected to @AviAvni through a 2-hop path via `falkordblite:.github`.\n\n- **Shared Path**: The shortest knowledge bridge between them goes from @gkorland to `falkordblite:.github`, and then to @AviAvni.\n- **Hops**: Exactly 2 hops via shared module contribution and review history."
+    },
+    {
+     "q": "Is there a relationship between Anchel123 and barakb?",
+     "expected": [
+      "path_between"
+     ],
+     "called": [
+      "path_between"
+     ],
+     "outcome": "answered",
+     "mode": "llm",
+     "tools_ok": true,
+     "outcome_ok": true,
+     "grounded": true,
+     "excluded": false,
+     "notes": [],
+     "ms": 3184,
+     "answer": "Yes, `@Anchel123` and `@barakb` are connected through shared knowledge in the codebase via a 2-hop path.\n\n* **Shared module:** Both contribute to `falkordb-browser:app/lib`.\n* **Path length:** Exactly 2 hops (`@Anchel123` $\\rightarrow$ `falkordb-browser:app/lib` $\\rightarrow$ `@barakb`)."
+    },
+    {
+     "q": "What did the last review say?",
+     "expected": [
+      "changes_since"
+     ],
+     "called": [
+      "recall"
+     ],
+     "outcome": "from_memory",
+     "mode": "llm",
+     "tools_ok": false,
+     "outcome_ok": true,
+     "grounded": true,
+     "excluded": false,
+     "notes": [],
+     "ms": 3168,
+     "answer": "The last review approved a succession plan for @Anchel123 and created pairing tasks to mitigate knowledge concentration.\n\n- **Decision:** Approved succession plan for @Anchel123 to pair five successors on sole-held modules.\n- **Risk Impact:** If @Anchel123 leaves, 21 modules become fragile (0 orphan"
+    },
+    {
+     "q": "Anything we noted about Anchel123 before?",
+     "expected": [
+      "recall"
+     ],
+     "called": [
+      "recall"
+     ],
+     "outcome": "from_memory",
+     "mode": "llm",
+     "tools_ok": true,
+     "outcome_ok": true,
+     "grounded": true,
+     "excluded": false,
+     "notes": [],
+     "ms": 3400,
+     "answer": "Yes, an approved succession plan and several open pairing tasks exist for @Anchel123.\n\n- **Approved plan**: A succession plan (`d-6751c1dd2b`) was approved on 2026-10-18 to pair 5 successors on modules held by @Anchel123.\n- **Fragility**: If @Anchel123 leaves, 21 modules become fragile (0 orphaned),"
+    },
+    {
+     "q": "Keep in mind that barakb is moving to another team in December",
+     "expected": [
+      "note_finding"
+     ],
+     "called": [
+      "succession_review",
+      "draft_actions"
+     ],
+     "outcome": "answered",
+     "mode": "llm",
+     "tools_ok": false,
+     "outcome_ok": true,
+     "grounded": true,
+     "excluded": false,
+     "notes": [],
+     "ms": 5653,
+     "answer": "If @barakb leaves in December without handover, 5 modules in `FalkorDB/falkordb-rs` (`src`, `src/response`, `src/error`, `src/graph`, `src/value`) will become orphaned, leaving under 22% active knowledge retention in each.\n\nSuccession plan and dry-run artifacts are ready:\n- **`falkordb-rs:src`**: pa"
+    },
+    {
+     "q": "Create a handoff plan for gkorland and draft the issues",
+     "expected": [
+      "succession_review",
+      "draft_actions"
+     ],
+     "called": [
+      "succession_review",
+      "draft_actions"
+     ],
+     "outcome": "answered",
+     "mode": "llm",
+     "tools_ok": true,
+     "outcome_ok": true,
+     "grounded": true,
+     "excluded": false,
+     "notes": [],
+     "ms": 5668,
+     "answer": "Here is the approved handoff plan and dry-run issue drafts for @gkorland across 4 at-risk modules:\n\n- **`docs:design`**: Pair @swilly22 with @gkorland (1 PR needed, ~1.0 month). Retained knowledge rises 13% \u2192 43%.\n- **`docs:agentic-memory`**: Pair @dragnot with @gkorland (1 PR needed, ~1.2 months). "
+    },
+    {
+     "q": "What is 2 + 2?",
+     "expected": [],
+     "called": [],
+     "outcome": "not_in_graph",
+     "mode": "llm->scripted",
+     "tools_ok": true,
+     "outcome_ok": true,
+     "grounded": true,
+     "excluded": false,
+     "notes": [
+      "model answered without calling a tool; answered by the scripted router"
+     ],
+     "ms": 1407,
+     "answer": "That is outside this graph. I can answer who holds the knowledge of a codebase, what breaks if someone leaves, who could step in, and what to do about it."
+    },
+    {
+     "q": "Who is the CEO of FalkorDB?",
+     "expected": [],
+     "called": [
+      "overview"
+     ],
+     "outcome": "answered",
+     "mode": "llm",
+     "tools_ok": false,
+     "outcome_ok": false,
+     "grounded": true,
+     "excluded": false,
+     "notes": [],
+     "ms": 2684,
+     "answer": "I have no information in the graph regarding who the CEO of FalkorDB is. The graph tracks 62 people (34 active), 114 modules, and 3,664 pull requests, but does not contain executive or organizational leadership roles."
+    },
+    {
+     "q": "What if ghost-user99 leaves?",
+     "expected": [
+      "what_if_leaves"
+     ],
+     "called": [
+      "what_if_leaves"
+     ],
+     "outcome": "unknown_entity",
+     "mode": "llm",
+     "tools_ok": true,
+     "outcome_ok": true,
+     "grounded": true,
+     "excluded": false,
+     "notes": [],
+     "ms": 3020,
+     "answer": "@ghost-user99 is not in the graph, so we cannot simulate their departure. \n\n- The tool returned `unknown_entity` for the query `ghost-user99`.\n- There were no similar handles or close alternatives found in the graph data."
+    },
+    {
+     "q": "Which modules would be abandoned if everyone inactive stayed gone?",
+     "expected": [
+      "risk_scan"
+     ],
+     "called": [
+      "overview",
+      "risk_scan",
+      "keystones"
+     ],
+     "outcome": "answered",
+     "mode": "llm",
+     "tools_ok": true,
+     "outcome_ok": true,
+     "grounded": true,
+     "excluded": false,
+     "notes": [],
+     "ms": 5061,
+     "answer": "No modules would become entirely orphaned if all inactive people stayed gone. Active coverage remains 99% to 100% across all critical modules. \n\nHowever, inactive contributors like @gkorland and @barakb hold sole-authorship over modules (such as `docs:design` and `falkordb-rs:src`), meaning their de"
+    }
+   ]
+  }
+ ]
+}

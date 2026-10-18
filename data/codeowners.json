@@ -1,0 +1,22 @@
+{
+ "FalkorDB/code-graph": null,
+ "FalkorDB/docs": null,
+ "FalkorDB/falkordb-browser": null,
+ "FalkorDB/FalkorDB-MCPServer": null,
+ "FalkorDB/falkordb-py": null,
+ "FalkorDB/falkordb-rs": null,
+ "FalkorDB/falkordb-ts": null,
+ "FalkorDB/FalkorDB": [
+  "CODEOWNERS",
+  "# Paths whose contents EXECUTE with this repository's credentials, rather than\n# merely being tested by CI.\n#\n# Why this is the control and the workflow check is not: for a merge-queue run\n# the workflow is read from the queue branch, which carries the pull request's\n# own changes \u2014 so a fork can edit the step that is supposed to refuse it. The\n# CODEOWNERS that applies to a pull request is always the one on the BASE\n# branch (\"the pull request will use the CODEOWNERS file from that branch in\n# the upstream repository\"), so a fork cannot supply the rules that judge it.\n#\n# This file only REQUESTS review on its own. It blocks merging only if the\n# ruleset also enables \"Require review from Code Owners\" \u2014 which is the point,\n# and has to be turned on separately.\n#\n# /tests/ and /flow.sh are deliberately not listed. Both execute, but a\n# contributor has to be able to add a test and adjust how it runs; that exposure\n# is handled by the queue running with persist-credentials off and no registry\n# credential, not by review.\n\n/build/          @FalkorDB/falkordb-core\n/.github/        @FalkorDB/falkordb-core\n\n# Listed so weakening the rules above needs the same approval they do.\n/CODEOWNERS      @FalkorDB/falkordb-core\n"
+ ],
+ "FalkorDB/falkordblite": null,
+ "FalkorDB/GraphRAG-SDK": null,
+ "FalkorDB/QueryWeaver": null,
+ "FalkorDB/text-to-cypher": null,
+ "pallets/click": null,
+ "pallets/flask": null,
+ "pallets/itsdangerous": null,
+ "pallets/jinja": null,
+ "pallets/werkzeug": null
+}
