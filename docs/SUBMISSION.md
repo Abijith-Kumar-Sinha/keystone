@@ -57,7 +57,7 @@ The code in this repository was written with an AI coding assistant, Claude Code
 
 ## Team and who did what
 
-Abijith Kumar Sinha: picked Track 01 and signed off on the product idea and scope, set the interface direction (chose the "Stand By" design and its minimal-text rule), pushed for a real model behind the agent and an honest evaluation of it, set up the model keys and deployed the live demo, and reviewed the results at each step. The code was written with Claude Code under his direction, as disclosed above.
+Abijith Kumar Sinha: picked Track 01 and signed off on the product idea and scope, set the interface direction (chose the "Stand By" design and its minimal-text rule), pushed for a real model behind the agent and an honest evaluation of it, set up the model keys and deployed the live demo, and reviewed the results at each step. Claude Code assisted with the coding, as disclosed above.
 
 ## Anticipated questions
 
