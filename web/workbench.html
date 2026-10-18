@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Keystone workbench</title>
+<meta name="theme-color" content="#0b0b0f">
+<link rel="preload" href="/static/fonts/bebas-neue.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/static/fonts/martian-mono.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/static/app.css">
+<link rel="stylesheet" href="/static/workbench.css">
+</head>
+<body class="wb">
+<header class="top">
+  <a class="mark" href="/">KEYSTONE</a>
+  <span class="strip" aria-hidden="true"></span>
+  <div class="right">
+    <div class="chans" role="group" aria-label="Graph">
+      <button class="chan" data-tenant="falkordb" aria-pressed="true">FALKORDB</button>
+      <button class="chan" data-tenant="pallets" aria-pressed="false">PALLETS</button>
+    </div>
+    <time class="tc" id="tc" aria-hidden="true">00:00:00:00</time>
+  </div>
+</header>
+
+<main>
+  <nav class="sources" id="sources" aria-label="Who leaves"></nav>
+  <section class="wall" id="wall" aria-label="Modules and what remains"></section>
+  <aside class="read" aria-label="Totals">
+    <div class="num"><span class="lbl">orphaned</span><b id="n-orphaned">0</b></div>
+    <div class="num"><span class="lbl">fragile</span><b id="n-fragile">0</b></div>
+    <button class="btn plan" id="plan" type="button" disabled>Make the plan</button>
+  </aside>
+</main>
+
+<footer class="bottom">
+  <p class="sr" id="live" role="status"></p>
+  <p class="say" id="say" role="status"></p>
+  <form class="cmd" id="cmd" autocomplete="off">
+    <label for="q" class="prompt">&gt;</label>
+    <input id="q" name="q" type="text" placeholder="What if someone leaves?" spellcheck="false" maxlength="300">
+    <button class="mode" id="mode" type="button" title="How the agent answers">ROUTER</button>
+    <button class="mode" id="proof" type="button" disabled>PROOF</button>
+  </form>
+</footer>
+
+<dialog class="sheet" id="sheet" aria-label="Details">
+  <div class="sheet-head">
+    <div class="tabs" role="tablist">
+      <button role="tab" data-tab="path" aria-selected="true">PATH</button>
+      <button role="tab" data-tab="trace" aria-selected="false">TRACE</button>
+      <button role="tab" data-tab="plan" aria-selected="false">PLAN</button>
+      <button role="tab" data-tab="patch" aria-selected="false">PATCH</button>
+      <button role="tab" data-tab="key" aria-selected="false">MODEL</button>
+    </div>
+    <button class="x" id="sheet-x" type="button" aria-label="Close">Close</button>
+  </div>
+  <div class="sheet-body" id="sheet-body"></div>
+</dialog>
+
+<script type="module" src="/static/workbench.js"></script>
+</body>
+</html>

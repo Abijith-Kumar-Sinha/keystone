@@ -1,0 +1,17 @@
+{
+  "regions": [
+    {"id": "topbar", "kind": "chrome", "box": {"x": 0, "y": 0, "w": 1, "h": 0.072}, "note": "Black top bar above the color bars, flush with the page edges, no border."},
+    {"id": "wordmark", "kind": "text", "box": {"x": 0.023, "y": 0.020, "w": 0.074, "h": 0.036}, "note": "The word KEYSTONE in bold condensed caps, white."},
+    {"id": "github", "kind": "text", "box": {"x": 0.747, "y": 0.029, "w": 0.032, "h": 0.018}, "note": "Small monospace link GitHub, white."},
+    {"id": "open-workbench", "kind": "control", "box": {"x": 0.797, "y": 0.014, "w": 0.091, "h": 0.046}, "note": "Solid white rectangular button with black monospace text Open workbench, no radius."},
+    {"id": "timecode", "kind": "text", "box": {"x": 0.909, "y": 0.029, "w": 0.068, "h": 0.018}, "note": "Monospace timecode 10:14:27:12, white."},
+    {"id": "color-bars", "kind": "chrome", "container": true, "codeDrawn": true, "box": {"x": 0, "y": 0.074, "w": 0.29, "h": 0.926}, "note": "Tall vertical strip of seven flat SMPTE color bars (white, yellow, cyan, green, magenta, red, blue) with faint horizontal tape-noise streaks and a chroma smear at the right edge; drawn in code with a canvas noise overlay."},
+    {"id": "stand-by-label", "kind": "text", "box": {"x": 0.014, "y": 0.899, "w": 0.17, "h": 0.057}, "note": "Black label box with white monospace caps PLEASE STAND BY, pinned to the foot of the color bars."},
+    {"id": "headline", "kind": "text", "box": {"x": 0.316, "y": 0.106, "w": 0.46, "h": 0.305}, "note": "Headline IF YOUR BEST ENGINEER QUITS TOMORROW, WHAT BREAKS? in very large condensed white caps over three lines."},
+    {"id": "cta", "kind": "control", "box": {"x": 0.316, "y": 0.434, "w": 0.136, "h": 0.054}, "note": "Solid white rectangular button with black monospace text Open the workbench, no radius."},
+    {"id": "cells", "kind": "chrome", "container": true, "codeDrawn": true, "box": {"x": 0.303, "y": 0.52, "w": 0.689, "h": 0.413}, "note": "A row of four equal black signal cells with 1px grey frames, each holding a hub-and-spoke diagram of one module; in the first cell one red spoke is torn away with a horizontal tracking glitch, the other cells are clean; the last cell carries a padlock icon."},
+    {"id": "cell-names", "kind": "text", "box": {"x": 0.316, "y": 0.54, "w": 0.67, "h": 0.024}, "note": "Four module names in small condensed monospace, one per cell: falkordb-browser:app, falkordb-browser:app/api, falkordb-browser:app/components, FalkorDB:src/execution_plan."},
+    {"id": "cell-pcts", "kind": "text", "box": {"x": 0.316, "y": 0.58, "w": 0.64, "h": 0.075}, "note": "Four very large percentages in condensed caps, one per cell: 37% white, 45% white, 35% red, 100% green beside the padlock."},
+    {"id": "torn-label", "kind": "text", "box": {"x": 0.425, "y": 0.77, "w": 0.043, "h": 0.02}, "note": "Small red monospace label Anchel123 beside the torn spoke in the first cell."}
+  ]
+}

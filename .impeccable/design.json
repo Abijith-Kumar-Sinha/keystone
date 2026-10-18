@@ -1,0 +1,140 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-18T00:00:00Z",
+  "title": "Design System: Keystone",
+  "extensions": {
+    "colorMeta": {
+      "ink": { "role": "neutral", "displayName": "Dead Air Ink", "canonical": "#0b0b0f", "tonalRamp": ["#0b0b0f", "#131318", "#1b0f13", "#2b3037", "#3a3f46", "#5d6167", "#858a92", "#9aa0a6"] },
+      "paper": { "role": "neutral", "displayName": "Test Card Paper", "canonical": "#f4f4f2", "tonalRamp": ["#5d6167", "#858a92", "#9aa0a6", "#b9bdc3", "#d9d9d8", "#e6e6e4", "#eeeeec", "#f4f4f2"] },
+      "signal-red": { "role": "primary", "displayName": "Break Red", "canonical": "#ff4b4b", "tonalRamp": ["#3a1215", "#5c1a1d", "#8a2428", "#b83136", "#ee2b2b", "#ff4b4b", "#ff7a7a", "#ffb0b0"] },
+      "signal-green": { "role": "secondary", "displayName": "Locked Green", "canonical": "#3ddc6c", "tonalRamp": ["#0e3a1a", "#145a29", "#1fc13b", "#2fd055", "#3ddc6c", "#6ae68e", "#98efb0", "#c6f7d3"] },
+      "mid": { "role": "neutral", "displayName": "Mid Grey (AA checked)", "canonical": "#858a92", "tonalRamp": ["#2b3037", "#3a3f46", "#5d6167", "#70757c", "#858a92", "#9aa0a6", "#b9bdc3", "#d9d9d8"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "The one landing headline." },
+      "band-heading": { "displayName": "Band heading", "purpose": "Section titles below the first viewport." },
+      "evidence-number": { "displayName": "Evidence number", "purpose": "Proof figures and step numerals." },
+      "readout-number": { "displayName": "Readout number", "purpose": "Workbench totals." },
+      "cell-number": { "displayName": "Cell number", "purpose": "Module percentage in each cell." },
+      "body": { "displayName": "Body mono", "purpose": "Names, notes, command line, sheet." },
+      "label": { "displayName": "Label", "purpose": "Channels, tabs, timecode, mode buttons." }
+    },
+    "shadows": [
+      { "name": "none", "value": "none", "purpose": "The system is flat; no box-shadows." },
+      { "name": "glitch-split", "value": "5u 0 0 rgba(255,75,75,0.85), -5u 0 0 rgba(20,180,227,0.8)", "purpose": "One-frame chromatic split on the headline during a glitch (text-shadow, u = comp pixel)." },
+      { "name": "focus-ring", "value": "outline: 2px solid #f4f4f2; outline-offset: 3px", "purpose": "Keyboard focus on every control." }
+    ],
+    "motion": [
+      { "name": "ease-out", "value": "cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "All state transitions." },
+      { "name": "control", "value": "160ms", "purpose": "Button, chip, tab color changes." },
+      { "name": "state-color", "value": "240ms", "purpose": "Cell and readout number color change." },
+      { "name": "cell-roll", "value": "360ms clip-path inset top-down", "purpose": "A workbench cell entering." },
+      { "name": "sheet-slide", "value": "260ms translateX(24px) to 0 with fade", "purpose": "Sheet opening." },
+      { "name": "number-settle", "value": "critically damped, w=7, max 2s", "purpose": "Percentages settle like a needle." },
+      { "name": "tracking-tear", "value": "700ms jittering red bars", "purpose": "The removed person's spoke tearing away." },
+      { "name": "bars", "value": "12fps repaint, timecode 40ms", "purpose": "Tape-noise color bars. Reduced motion: still frame." }
+    ],
+    "breakpoints": [
+      { "name": "workbench-stack", "value": "900px" },
+      { "name": "landing-stack", "value": "800px" },
+      { "name": "landing-bands-roomy", "value": "1100px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Paper fill, inverts on hover; the only primary action per screen.",
+      "html": "<a class=\"ds-btn\" href=\"#\">Open the workbench</a>",
+      "css": ".ds-btn { display:inline-flex; align-items:center; justify-content:center; height:46px; padding:0 22px; background:#f4f4f2; color:#0b0b0f; border:1px solid #f4f4f2; font-family:'Martian Mono',ui-monospace,monospace; font-stretch:75%; font-weight:700; font-size:14px; letter-spacing:0.03em; text-decoration:none; transition:background 160ms cubic-bezier(0.16,1,0.3,1), color 160ms cubic-bezier(0.16,1,0.3,1); } .ds-btn:hover { background:#0b0b0f; color:#f4f4f2; } .ds-btn:focus-visible { outline:2px solid #f4f4f2; outline-offset:3px; } .ds-btn:active { transform:translateY(1px); }"
+    },
+    {
+      "name": "Mode Button",
+      "kind": "chip",
+      "refersTo": "mode-button",
+      "description": "Quiet 1px control in the command line.",
+      "html": "<button class=\"ds-mode\">ROUTER</button>",
+      "css": ".ds-mode { background:none; border:1px solid #2b3037; color:#9aa0a6; padding:7px 10px; font:500 12px/1 'Martian Mono',ui-monospace,monospace; font-stretch:75%; letter-spacing:0.1em; cursor:pointer; transition:color 160ms, border-color 160ms; } .ds-mode:hover { color:#f4f4f2; border-color:#f4f4f2; } .ds-mode:focus-visible { outline:2px solid #f4f4f2; outline-offset:3px; }"
+    },
+    {
+      "name": "Cell (cut)",
+      "kind": "card",
+      "refersTo": "cell",
+      "description": "Module tile: name, big state-colored percentage, hub diagram with a torn red spoke.",
+      "html": "<div class=\"ds-cell\"><p class=\"ds-name\">falkordb-browser:app</p><p class=\"ds-pct\">37%</p><svg viewBox=\"0 0 256 200\" width=\"100%\" height=\"120\"><line x1=\"90\" y1=\"98\" x2=\"174\" y2=\"92\" stroke=\"#ff4b4b\" stroke-dasharray=\"3 5\" opacity=\".55\"/><line x1=\"90\" y1=\"98\" x2=\"60\" y2=\"20\" stroke=\"#8a8f96\"/><circle cx=\"60\" cy=\"20\" r=\"8\" fill=\"#b9bdc3\"/><circle cx=\"174\" cy=\"92\" r=\"11\" fill=\"#ff4b4b\"/><circle cx=\"90\" cy=\"98\" r=\"26\" fill=\"#5d6167\"/></svg></div>",
+      "css": ".ds-cell { position:relative; width:220px; height:260px; border:1px solid #2b3037; background:#0b0b0f; overflow:hidden; } .ds-name { position:absolute; left:14px; top:12px; margin:0; font:500 12.5px/1 'Martian Mono',monospace; font-stretch:75%; color:#f4f4f2; } .ds-pct { position:absolute; left:14px; top:34px; margin:0; font:400 64px/0.8 'Bebas Neue',Oswald,'Arial Narrow',sans-serif; color:#ff4b4b; } .ds-cell svg { position:absolute; left:0; bottom:6px; }"
+    },
+    {
+      "name": "Source Chip",
+      "kind": "nav",
+      "refersTo": "source-chip-current",
+      "description": "A person in the sources list; current one is red with a 4px rule.",
+      "html": "<button class=\"ds-src\" aria-current=\"true\">Anchel123</button>",
+      "css": ".ds-src { display:block; width:232px; text-align:left; background:#1b0f13; border:0; border-left:4px solid #ff4b4b; padding:20px 22px; color:#ff4b4b; font:400 22px/1 'Martian Mono',monospace; font-stretch:75%; cursor:pointer; } .ds-src:focus-visible { outline:2px solid #f4f4f2; outline-offset:3px; }"
+    },
+    {
+      "name": "Readout",
+      "kind": "custom",
+      "refersTo": "readout-number",
+      "description": "Label and a huge green or red number.",
+      "html": "<div class=\"ds-num\"><span>orphaned</span><b>3</b></div>",
+      "css": ".ds-num span { display:block; font:400 28px/1 'Bebas Neue',Oswald,'Arial Narrow',sans-serif; letter-spacing:0.06em; text-transform:uppercase; color:#f4f4f2; } .ds-num b { display:block; font:400 140px/0.82 'Bebas Neue',Oswald,'Arial Narrow',sans-serif; color:#3ddc6c; }"
+    },
+    {
+      "name": "Command Line",
+      "kind": "input",
+      "refersTo": "command-line",
+      "description": "Green prompt, borderless input with a block caret.",
+      "html": "<form class=\"ds-cmd\"><span class=\"ds-prompt\">&gt;</span><input placeholder=\"What if someone leaves?\"></form>",
+      "css": ".ds-cmd { display:flex; align-items:center; gap:12px; padding:16px 22px; border-top:1px solid #2b3037; background:#0b0b0f; } .ds-prompt { color:#3ddc6c; font:400 24px/1 'Martian Mono',monospace; } .ds-cmd input { flex:1; background:none; border:0; outline:none; color:#f4f4f2; caret-color:#f4f4f2; caret-shape:block; font:400 24px/1.2 'Martian Mono',monospace; font-stretch:75%; } .ds-cmd input::placeholder { color:#858a92; } .ds-cmd:focus-within { outline:2px solid #f4f4f2; outline-offset:-2px; }"
+    },
+    {
+      "name": "Tools Grid",
+      "kind": "custom",
+      "refersTo": "tools",
+      "description": "Tool names ruled by 1px lines; green names write to the graph.",
+      "html": "<ul class=\"ds-tools\"><li>overview</li><li>find_modules</li><li class=\"w\">draft_actions</li></ul>",
+      "css": ".ds-tools { list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(3,1fr); border-top:1px solid #2b3037; } .ds-tools li { padding:16px 0; border-bottom:1px solid #2b3037; font:400 16px/1 'Martian Mono',monospace; color:#f4f4f2; } .ds-tools li.w { color:#3ddc6c; }"
+    },
+    {
+      "name": "Evidence Number",
+      "kind": "custom",
+      "refersTo": "evidence-number",
+      "description": "Giant Bebas figure under a 1px rule with a dim caption.",
+      "html": "<div class=\"ds-ev\"><b>95%</b><span>of its April picks took over by October</span></div>",
+      "css": ".ds-ev { border-top:1px solid #2b3037; padding-top:16px; } .ds-ev b { display:block; font:400 110px/0.8 'Bebas Neue',Oswald,'Arial Narrow',sans-serif; color:#3ddc6c; } .ds-ev span { display:block; margin-top:12px; color:#9aa0a6; font:400 16px/1.4 'Martian Mono',monospace; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Stand By",
+    "overview": "A broadcast has been interrupted to ask one question. The system is a test card: near-black ink, paper white, one signal red for what breaks, one green for what holds, and SMPTE color bars as the single decorative signature. Display type is condensed Bebas Neue caps; everything else is Martian Mono at condensed width.\n\nText is minimal by rule: one headline, one primary button, big numbers, names only where a number needs one. Frames are flat 1px lines, with no radii and no shadows.",
+    "keyCharacteristics": [
+      "Color bars are the only decorative color; red and green are the only semantic colors.",
+      "Big Bebas numbers carry state; mono carries names, timecode and tools.",
+      "Flat, square, 1px line frames. No radius, no shadow.",
+      "Motion is signal degradation and is a still frame under reduced motion."
+    ],
+    "rules": [
+      { "name": "The One Accent Rule", "body": "Red means broken or removed; green means held or written. Nothing else is saturated outside the bars.", "section": "colors" },
+      { "name": "The Bars Stay Decorative Rule", "body": "The seven bar colors never encode state and never appear on controls.", "section": "colors" },
+      { "name": "The Number Is The Headline Rule", "body": "If a thing can be said as a big number, do not say it as a sentence.", "section": "typography" },
+      { "name": "The Flat Frame Rule", "body": "Surfaces are separated by a 1px line or by a tone step, never by a shadow or radius.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do let a big Bebas number carry each state and color it red or green.",
+      "Do keep one headline and one primary button per screen; names only beside a number.",
+      "Do keep every frame 1px line, radius 0, no shadows.",
+      "Do keep mid (#858a92) as the lightest text on ink that is decorative or secondary; it was contrast-checked.",
+      "Do show a settled state under reduced motion and restack phone layouts without page-level horizontal scroll.",
+      "Do keep focus visible: 2px paper outline, 3px offset."
+    ],
+    "donts": [
+      "Don't use a color bar color for state, controls or text.",
+      "Don't add a third saturated accent, gradients, glow or decorative dots.",
+      "Don't add paragraphs, captions or log blocks to the hero or the workbench default view.",
+      "Don't use em-dashes in copy.",
+      "Don't encode risk by color alone; keep the number, the dashed spoke or the label."
+    ]
+  }
+}

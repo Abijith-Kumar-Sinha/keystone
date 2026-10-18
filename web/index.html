@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Keystone: if your best engineer quits tomorrow, what breaks?</title>
+<meta name="description" content="Keystone reads your pull requests as a graph, removes one person on a copy, and shows what breaks.">
+<meta name="theme-color" content="#0b0b0f">
+<link rel="preload" href="/static/fonts/bebas-neue.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/static/fonts/martian-mono.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/static/app.css">
+<link rel="stylesheet" href="/static/landing.css">
+</head>
+<body>
+<div class="stage">
+  <div class="frame" id="frame">
+    <header class="topbar">
+      <span class="bar-bg r" aria-hidden="true"></span>
+      <a class="wordmark r" href="/">KEYSTONE</a>
+      <a class="link-gh r" href="https://github.com/Abijith-Kumar-Sinha/keystone">GitHub</a>
+      <a class="btn btn-open r" href="/workbench">Open workbench</a>
+      <time class="tc r" id="tc" aria-hidden="true">10:14:27:12</time>
+    </header>
+
+    <div class="bars r" aria-hidden="true"><canvas id="bars"></canvas></div>
+    <p class="standby r">PLEASE STAND BY</p>
+
+    <h1 class="headline r" id="headline">If your best engineer quits tomorrow, <span class="glitch-line">what breaks?</span></h1>
+    <a class="btn btn-cta r" href="/workbench">Open the workbench</a>
+
+    <section class="cells r" id="cells" aria-label="What breaks if one person leaves" aria-live="polite"></section>
+  </div>
+</div>
+
+<div class="after">
+  <section class="band" id="how">
+    <h2>Three steps</h2>
+    <div class="steps">
+      <div class="step"><b>1</b><span>Read</span><svg viewBox="0 0 256 200" aria-hidden="true" data-demo="read"></svg></div>
+      <div class="step"><b>2</b><span>Remove one</span><svg viewBox="0 0 256 200" aria-hidden="true" data-demo="remove"></svg></div>
+      <div class="step"><b>3</b><span>Plan</span><svg viewBox="0 0 256 200" aria-hidden="true" data-demo="plan"></svg></div>
+    </div>
+  </section>
+
+  <section class="band" id="tools">
+    <h2>15 tools over MCP</h2>
+    <ul class="tools" id="tools-list" aria-label="The agent's tools"></ul>
+    <p class="note">Green writes to the graph.</p>
+  </section>
+
+  <section class="band" id="evidence">
+    <h2>It checks itself</h2>
+    <div class="nums">
+      <div><b class="g">95%</b><span>of its April picks took over by October</span></div>
+      <div><b>39%</b><span>a random pick</span></div>
+      <div><b>113 ms</b><span>to remove a person on a graph copy</span></div>
+    </div>
+    <p class="note">A most-active rule also scores 95%. The graph adds the proof, the what-if and the checked plan.</p>
+  </section>
+
+  <footer class="foot">
+    <span>Built on FalkorDB for Graph Hacks, Track 01.</span>
+    <a href="https://github.com/Abijith-Kumar-Sinha/keystone">github.com/Abijith-Kumar-Sinha/keystone</a>
+  </footer>
+</div>
+
+<script type="module" src="/static/landing.js"></script>
+</body>
+</html>

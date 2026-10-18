@@ -1,0 +1,56 @@
+/* Keystone: Stand By world. Shared tokens and base. Fonts are self-hosted (OFL): Bebas Neue, Martian Mono. */
+@font-face { font-family: "Bebas Neue"; src: url("/static/fonts/bebas-neue.woff2") format("woff2"); font-display: swap; }
+@font-face { font-family: "Martian Mono"; src: url("/static/fonts/martian-mono.woff2") format("woff2-variations"); font-weight: 100 800; font-stretch: 75% 112.5%; font-display: swap; }
+
+:root {
+  --ink: #0b0b0f;
+  --ink-2: #131318;
+  --paper: #f4f4f2;
+  --dim: #9aa0a6;
+  --mid: #858a92;
+  --line: #2b3037;
+  --red: #ff4b4b;
+  --green: #3ddc6c;
+  --bar-white: #d9d9d8;
+  --bar-yellow: #e3d20f;
+  --bar-cyan: #14b4e3;
+  --bar-green: #1fc13b;
+  --bar-magenta: #e024d7;
+  --bar-red: #ee2b2b;
+  --bar-blue: #0b1ae5;
+  --display: "Bebas Neue", "Oswald", "Arial Narrow", sans-serif;
+  --mono: "Martian Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { background: var(--ink); color: var(--paper); scrollbar-color: #3a3f46 var(--ink); scrollbar-width: thin; }
+body { margin: 0; font-family: var(--mono); font-stretch: 75%; font-size: 16px; line-height: 1.4; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; font-variant-numeric: tabular-nums; }
+::selection { background: var(--red); color: #fff; }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--ink); }
+::-webkit-scrollbar-thumb { background: #3a3f46; border: 2px solid var(--ink); }
+a { color: inherit; text-underline-offset: 0.25em; text-decoration-thickness: 1px; }
+:focus-visible { outline: 2px solid var(--paper); outline-offset: 3px; }
+button { font: inherit; color: inherit; }
+h1, h2, h3, p { margin: 0; }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--paper); color: var(--ink); border: 1px solid var(--paper);
+  font-family: var(--mono); font-stretch: 75%; font-weight: 700; white-space: nowrap; text-align: center; text-decoration: none; letter-spacing: 0.03em; cursor: pointer;
+  transition: background 160ms var(--ease-out), color 160ms var(--ease-out);
+}
+.btn:hover { background: var(--ink); color: var(--paper); }
+.btn:active { transform: translateY(1px); }
+.btn[disabled] { opacity: 0.4; cursor: not-allowed; }
+
+.sr { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* locked padlock, drawn once (24x24 box, 2px stroke) */
+.lock { width: 1em; height: 1em; fill: none; stroke: var(--paper); stroke-width: 2; stroke-linecap: square; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
+}
