@@ -34,6 +34,11 @@ def tenants() -> list[str]:
     return sorted(n[len(PREFIX):] for n in names if n.startswith(PREFIX) and FORK not in n)
 
 
+def public_tenants() -> list[str]:
+    """The shared graphs. A visitor's private 	ry-* sandbox is reachable only by whoever holds its name, so it is never listed."""
+    return [t for t in tenants() if not t.startswith("try-")]
+
+
 def exists(tenant: str) -> bool:
     return tenant in tenants()
 

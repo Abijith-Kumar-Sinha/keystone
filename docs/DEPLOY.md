@@ -24,6 +24,17 @@ Public deployments set `KEYSTONE_WRITABLE=sandbox` (already the image default): 
 6. Check `https://<your-address>/api/health`: it should list `falkordb` and `pallets`, `"writable":"sandbox"` and `"server_llm":true` with the model names (never the keys).
 7. Optional, recommended: a free monitor (for example UptimeRobot) that requests `/api/health` every 5 minutes keeps the service awake, so a judge never waits for a cold start. A free instance has 750 hours a month, enough for one service running all month.
 
+## Settings that matter on a public host
+
+| Variable | Default | What it does |
+|---|---|---|
+| `KEYSTONE_WRITABLE` | `sandbox` in the image | Base graphs are read-only; only a visitor's private sandbox accepts writes. |
+| `MAX_SANDBOXES` | 40 (12 in `render.yaml`) | How many sandboxes exist at once. A sandbox younger than two minutes is never evicted; a full server answers 503 "busy". |
+| `KEYSTONE_TRUSTED_PROXIES` | 1 | How many reverse proxies sit in front of the app. The client address is the `X-Forwarded-For` entry that many hops from the right, which a client cannot forge. Use 0 with no proxy. |
+| `KEYSTONE_ADMIN_TOKEN` | unset | Needed (as the `x-admin-token` header) to post a drafted issue as a real GitHub issue, and only when `KEYSTONE_GH_REPO` and `GITHUB_TOKEN` are also set. Leave all three unset on a public demo. |
+
+Rate limits apply per client and across everyone, to the API and to `/mcp`.
+
 ## Giving the agent a real model
 
 Without a key, visitors get the keyword router (it handled about two thirds of unseen wording in our evaluation, and a model does the tool choosing properly). The app accepts any OpenAI-compatible endpoint, or Anthropic:

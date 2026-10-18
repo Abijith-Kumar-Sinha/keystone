@@ -40,7 +40,7 @@ def tool(fn):
 def _tenant(t: str) -> str:
     t = (t or DEFAULT).strip()
     if not db.exists(t):
-        raise ValueError(f"unknown tenant '{t}'. Available: {', '.join(db.tenants())}")
+        raise ValueError(f"unknown tenant '{t}'. Available: {', '.join(db.public_tenants())}")
     return t
 
 
@@ -149,7 +149,7 @@ def note_finding(text: str, about: list[str], tenant: str = "") -> dict:
 @mcp.resource("keystone://tenants")
 def tenants_resource() -> str:
     """Graphs (organisations) available on this server."""
-    return "\n".join(db.tenants())
+    return "\n".join(db.public_tenants())
 
 
 @mcp.prompt()

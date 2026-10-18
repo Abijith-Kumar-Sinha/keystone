@@ -170,9 +170,10 @@ The real model path is also covered by tests that need no key (`FakeModel` in `t
 ## Safety, privacy and limits
 
 - Public data only: merged pull requests of public repositories. GitHub logins appear (they are public); email addresses are never requested or stored.
-- The public deployment serves read-only base graphs; every visitor works in a private `GRAPH.COPY` sandbox that is deleted after a few hours.
+- The public deployment serves read-only base graphs; every visitor works in a private `GRAPH.COPY` sandbox that is deleted after a few hours. A sandbox name is 96 random bits and is never listed (not by the API, not by the MCP resource, not in error messages), so the name is the visitor's capability. A sandbox started in the last two minutes is never evicted to make room for another.
+- Every endpoint, including `/mcp`, is rate-limited per client and across everyone, and the client address comes from the proxy's own `X-Forwarded-For` entry (`KEYSTONE_TRUSTED_PROXIES`), so a forged header cannot lift the global cap.
 - A visitor's own LLM key is used for that single request, is never stored or logged, and may only target an allowlist of provider hosts.
-- Actions are dry runs. Posting is off unless the operator sets `KEYSTONE_GH_REPO` (one repository they own) and `GITHUB_TOKEN`, and the request carries `confirm=true`.
+- Actions are dry runs. Posting is off unless the operator sets `KEYSTONE_GH_REPO` (one repository they own), `GITHUB_TOKEN` and `KEYSTONE_ADMIN_TOKEN`, and the request carries `confirm=true` and the admin token in an `x-admin-token` header. A visitor can never open an issue.
 - Limits: PR history is a proxy for knowledge (it misses design discussions, on-call work and direct pushes); module boundaries are directory heuristics; the successor ranking was only backtested on two organisations.
 
 ## AI assistance disclosure

@@ -6,11 +6,12 @@ Public-deployment safety: base graphs are read-only (KEYSTONE_WRITABLE=sandbox);
 (`try-<id>`, deleted after SANDBOX_TTL); bring-your-own LLM keys live only for the request and may only target an allowlist of hosts.
 """
 import asyncio
+import hmac
 import json
 import os
 import re
+import secrets
 import time
-import uuid
 from collections import defaultdict, deque
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -34,15 +35,47 @@ _sandboxes: dict[str, float] = {}
 _hits: dict[tuple, deque] = defaultdict(deque)
 
 
-def limited(request: Request, bucket: str, n: int, per: int = 60) -> None:
-    ip = (request.headers.get("x-forwarded-for") or (request.client.host if request.client else "?")).split(",")[0].strip()
-    q, now = _hits[(ip, bucket)], time.time()
-    while q and q[0] < now - per:
-        q.popleft()
-    if len(q) >= n:
-        raise HTTPException(429, f"Slow down: max {n} {bucket} requests per {per}s.")
-    q.append(now)
+TRUSTED_PROXIES = int(os.environ.get("KEYSTONE_TRUSTED_PROXIES", 1))   # reverse proxies in front of the app (Render, Hugging Face: 1; none: 0)
 
+
+def client_ip(request: Request) -> str:
+    """The caller's address. Each trusted proxy appends the peer it saw to X-Forwarded-For, so the entry that many hops from the right is the
+    one our own infrastructure recorded; entries to its left are whatever the client chose to send, and are ignored."""
+    hops = [h.strip() for h in (request.headers.get("x-forwarded-for") or "").split(",") if h.strip()]
+    if TRUSTED_PROXIES and len(hops) >= TRUSTED_PROXIES:
+        return hops[-TRUSTED_PROXIES]
+    return request.client.host if request.client else "?"
+
+
+def limited(request: Request, bucket: str, n: int, per: int = 60, total: int | None = None) -> None:
+    """At most n requests per client and `total` across everyone in `per` seconds, so a forged address cannot lift the global cap."""
+    now = time.time()
+    for key, cap in ((client_ip(request), n), ("*", total)):
+        if cap is None:
+            continue
+        q = _hits[(key, bucket)]
+        while q and q[0] < now - per:
+            q.popleft()
+        if len(q) >= cap:
+            raise HTTPException(429, f"Slow down: max {cap} {bucket} requests per {per}s{' for everyone' if key == '*' else ''}.")
+    for key in (client_ip(request), "*"):
+        _hits[(key, bucket)].append(now)
+
+
+class Limit:
+    """Pure ASGI wrapper (it must not buffer the streamed MCP responses) that rate-limits everything under a mount."""
+
+    def __init__(self, app, bucket: str, n: int, total: int):
+        self.app, self.bucket, self.n, self.total = app, bucket, n, total
+
+    async def __call__(self, scope, receive, send):
+        if scope["type"] == "http":
+            try:
+                limited(Request(scope), self.bucket, self.n, total=self.total)
+            except HTTPException as e:
+                await JSONResponse({"detail": e.detail}, status_code=e.status_code)(scope, receive, send)
+                return
+        await self.app(scope, receive, send)
 
 def drop_sandbox(name: str) -> None:
     try:
@@ -80,7 +113,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="Keystone", lifespan=lifespan)
-app.mount("/mcp", mcp_app)
+app.mount("/mcp", Limit(mcp_app, "mcp", 60, 240))
 
 
 def tenant_or_404(t: str) -> str:
@@ -123,7 +156,7 @@ def provider_for(cfg: dict | None) -> list:
 @app.get("/api/health")
 def health():
     models = [p.model for p in provider_for(None)]               # model names only, never keys
-    return {"ok": True, "tenants": [t for t in db.tenants() if not t.startswith("try-")], "sandboxes": len(_sandboxes),
+    return {"ok": True, "tenants": db.public_tenants(), "sandboxes": len(_sandboxes),
             "server_llm": bool(models), "models": models, "writable": os.environ.get("KEYSTONE_WRITABLE", "all")}
 
 
@@ -140,15 +173,21 @@ def tenants():
 
 @app.post("/api/sandbox")
 def sandbox(body: Sandbox, request: Request):
-    limited(request, "sandbox", 4)
+    limited(request, "sandbox", 6, total=30)
     base = tenant_or_404(body.base)
     if base.startswith("try-"):
         raise HTTPException(400, "fork a base graph, not a sandbox")
     sweep()
     while len(_sandboxes) >= MAX_SANDBOXES:
-        drop_sandbox(min(_sandboxes, key=_sandboxes.get))
-    name = f"try-{uuid.uuid4().hex[:8]}"
-    db.client().connection.execute_command("GRAPH.COPY", db.PREFIX + base, db.PREFIX + name)
+        oldest = min(_sandboxes, key=_sandboxes.get)
+        if time.time() - _sandboxes[oldest] < 120:       # never evict a sandbox someone started in the last two minutes
+            raise HTTPException(503, "All sandboxes are in use. Try again in a minute.")
+        drop_sandbox(oldest)
+    name = f"try-{secrets.token_hex(12)}"                # 96 random bits: the name is the capability, and it is never listed anywhere
+    try:
+        db.client().connection.execute_command("GRAPH.COPY", db.PREFIX + base, db.PREFIX + name)
+    except Exception as e:                               # FalkorDB forks to copy a graph: under memory pressure that can fail, and the visitor should just retry
+        raise HTTPException(503, "The server is busy copying graphs. Try again in a few seconds.") from e
     _sandboxes[name] = time.time()
     return {"tenant": name, "base": base, "ttl_seconds": SANDBOX_TTL}
 
@@ -209,15 +248,16 @@ def cells(tenant: str, leaver: str = "", n: int = 9, affected: int = -1):
 
 @app.post("/api/ask")
 async def ask(body: Ask, request: Request):
-    limited(request, "ask", 20)
+    limited(request, "ask", 20, total=90)
     t = tenant_or_404(body.tenant)
-    return await agent.ask(t, body.question.strip(), body.history[-6:], provider_for(body.llm), body.focus)
+    history = [{"role": "assistant" if h.get("role") == "assistant" else "user", "content": str(h.get("content", ""))[:2000]} for h in body.history[-6:]]
+    return await agent.ask(t, body.question.strip(), history, provider_for(body.llm), body.focus)
 
 
 @app.post("/api/tool")
 async def tool(body: Tool, request: Request):
     """The UI's buttons call tools through the same MCP path the agent uses."""
-    limited(request, "tool", 40)
+    limited(request, "tool", 40, total=150)
     from mcp.shared.memory import create_connected_server_and_client_session
     t = tenant_or_404(body.tenant)
     async with create_connected_server_and_client_session(mcp._mcp_server) as client:
@@ -240,7 +280,11 @@ def memory(tenant: str):
 
 @app.post("/api/actions/{action_id}/execute")
 def execute(action_id: str, tenant: str, confirm: bool = False, request: Request = None):
-    limited(request, "execute", 3)
+    limited(request, "execute", 3, total=6)
+    if os.environ.get("KEYSTONE_GH_REPO"):                # posting a real issue is the operator's decision: it needs the admin token as well as confirm=true
+        want = os.environ.get("KEYSTONE_ADMIN_TOKEN", "")
+        if not want or not hmac.compare_digest(request.headers.get("x-admin-token", ""), want):
+            raise HTTPException(403, "Posting needs the operator's admin token (header x-admin-token).")
     t = tenant_or_404(tenant)
     if not writable(t):
         raise HTTPException(403, "read-only graph")

@@ -10,6 +10,7 @@ Builds a tiny hand-made org (not the real data) so every number below can be ver
 import asyncio
 import json
 import os
+import re
 import time
 from pathlib import Path
 
@@ -220,6 +221,69 @@ def test_api_rejects_unknown_tenant_and_non_allowlisted_llm_host(client):
     assert client.post("/api/ask", json={"tenant": "nope", "question": "x"}).status_code == 404
     bad = client.post("/api/ask", json={"tenant": T, "question": "x", "llm": {"provider": "openai", "key": "k", "base_url": "https://169.254.169.254/v1"}})
     assert bad.status_code == 400
+
+
+def test_sandbox_names_are_unguessable_and_never_listed(client):
+    from keystone import mcp_server
+    sb = client.post("/api/sandbox", json={"base": T}).json()["tenant"]
+    try:
+        assert re.fullmatch(r"try-[0-9a-f]{24}", sb)                                   # 96 random bits: the name is the capability
+        assert sb not in client.get("/api/health").json()["tenants"] and sb not in [t["name"] for t in client.get("/api/tenants").json()]
+        assert sb not in mcp_server.tenants_resource()
+        with pytest.raises(ValueError) as e:
+            mcp_server._tenant("nope")
+        assert sb not in str(e.value)                                                  # the error message does not list other visitors' sandboxes
+    finally:
+        db.client().connection.execute_command("GRAPH.DELETE", db.PREFIX + sb)
+
+
+def test_client_address_ignores_what_the_client_forges_and_the_global_cap_holds(client, monkeypatch):
+    from starlette.requests import Request
+    from keystone import api
+
+    def req(xff):
+        return Request({"type": "http", "headers": [(b"x-forwarded-for", xff.encode())] if xff else [], "client": ("10.0.0.9", 1234), "method": "GET", "path": "/"})
+    monkeypatch.setattr(api, "TRUSTED_PROXIES", 1)
+    assert api.client_ip(req("6.6.6.6, 1.2.3.4")) == "1.2.3.4"                       # the entry our own proxy appended, not the forged one
+    assert api.client_ip(req(None)) == "10.0.0.9"
+    monkeypatch.setattr(api, "TRUSTED_PROXIES", 0)
+    assert api.client_ip(req("6.6.6.6, 1.2.3.4")) == "10.0.0.9"
+    monkeypatch.setattr(api, "TRUSTED_PROXIES", 1)
+    api._hits.clear()
+    with pytest.raises(api.HTTPException) as e:                                        # forging a fresh address each time does not lift the global cap
+        for i in range(10):
+            api.limited(req(f"9.9.9.{i}, 7.7.7.{i}"), "capcheck", 100, total=5)
+    assert e.value.status_code == 429 and "for everyone" in e.value.detail
+
+
+def test_mcp_mount_is_rate_limited(client):
+    from keystone import api
+    api._hits.clear()
+    codes = {client.post("/mcp/", json={}).status_code for _ in range(70)}
+    assert 429 in codes
+
+
+def test_posting_a_real_issue_needs_the_operator_token(client, monkeypatch):
+    monkeypatch.setenv("KEYSTONE_GH_REPO", "owner/repo")
+    monkeypatch.setenv("KEYSTONE_ADMIN_TOKEN", "s3cret")
+    from keystone import api
+    api._hits.clear()
+    sb = client.post("/api/sandbox", json={"base": T}).json()["tenant"]
+    try:
+        call = lambda **h: client.post("/api/actions/a-1/execute", params={"tenant": sb, "confirm": True}, headers=h)
+        none = call()
+        assert none.status_code == 403 and "admin token" in none.json()["detail"]
+        assert call(**{"x-admin-token": "wrong"}).status_code == 403
+        assert call(**{"x-admin-token": "s3cret"}).status_code == 200               # past the guard: the call itself then says posting is not configured
+    finally:
+        db.client().connection.execute_command("GRAPH.DELETE", db.PREFIX + sb)
+
+
+def test_only_a_model_on_this_machine_gets_the_long_budget():
+    from keystone import llm
+    assert llm.Provider("openai", "k", None, "http://localhost:11434/v1").local is True
+    assert llm.Provider("openai", "k", None, "https://api.openai.com/v1/localhost?x=127.0.0.1").local is False
+    assert llm.Provider("openai", "k", None, "https://api.groq.com/openai/v1").timeout == 30
 
 
 def test_graph_view_carries_what_every_design_needs(client):

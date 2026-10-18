@@ -7,6 +7,7 @@ import json
 import os
 import re
 import time
+from urllib.parse import urlparse
 
 import httpx
 
@@ -52,7 +53,7 @@ class Provider:
         self.kind, self.key = kind, key
         self.model = model or d["model"]
         self.base = (base_url or d["base_url"]).rstrip("/")
-        self.local = any(h in self.base for h in ("localhost", "127.0.0.1"))
+        self.local = urlparse(self.base).hostname in ("localhost", "127.0.0.1", "::1")   # by host, not by a substring of the URL: only a model on this machine gets the long budget
         self.effort = os.environ.get("LLM_REASONING_EFFORT") or None   # optional: "low" makes reasoning models answer faster
         self.timeout = 600 if self.local else 30          # a local thinking model can reason for minutes on a laptop GPU; a hosted one should not
 
