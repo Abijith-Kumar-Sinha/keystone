@@ -1,0 +1,19 @@
+# docker compose up --build   ->  app on http://localhost:8000, FalkorDB Browser on http://localhost:3000
+services:
+  db:
+    image: falkordb/falkordb:latest
+    ports: ["6379:6379", "3000:3000"]
+    volumes: ["falkordb-data:/var/lib/falkordb/data"]
+  app:
+    build: .
+    depends_on: [db]
+    ports: ["8000:7860"]
+    environment:
+      FALKORDB_HOST: db            # not 127.0.0.1, so the image skips its embedded FalkorDB
+      KEYSTONE_WRITABLE: all
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      LLM_API_KEY: ${LLM_API_KEY:-}
+      LLM_BASE_URL: ${LLM_BASE_URL:-}
+      KEYSTONE_MODEL: ${KEYSTONE_MODEL:-}
+volumes:
+  falkordb-data:

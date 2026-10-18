@@ -1,0 +1,8 @@
+# Local test model for Keystone: the vision-language model already installed with Ollama, with a longer context
+# (the 15 tool descriptions plus tool results do not fit in Ollama's default window) and a calmer temperature for tool calls.
+#   ollama create keystone-local -f deploy/Modelfile.local
+# then in .env:  LLM_API_KEY=ollama   LLM_BASE_URL=http://localhost:11434/v1   KEYSTONE_MODEL=keystone-local
+FROM qwen3-vl:8b
+PARAMETER num_ctx 12288
+PARAMETER temperature 0.2
+PARAMETER top_p 0.9

@@ -1,0 +1,13 @@
+.venv
+.git
+.env
+.env.*
+.impeccable
+.pytest_cache
+__pycache__
+data/raw
+data/*.log
+tests
+bench
+docs
+*.md

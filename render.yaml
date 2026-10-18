@@ -1,0 +1,26 @@
+# Render Blueprint: on render.com choose New > Blueprint and pick this repository. Free instance, built from the Dockerfile.
+# Render asks you for the two secrets (the LLM keys) when you apply it; they are never stored in this repository.
+services:
+  - type: web
+    name: keystone
+    runtime: docker
+    plan: free
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: KEYSTONE_WRITABLE          # base graphs read-only; every visitor gets a private GRAPH.COPY sandbox
+        value: sandbox
+      - key: MAX_SANDBOXES
+        value: "12"
+      - key: LLM_BASE_URL               # primary model: Google Gemini
+        value: https://generativelanguage.googleapis.com/v1beta/openai/
+      - key: KEYSTONE_MODEL
+        value: gemini-3.5-flash-lite
+      - key: LLM_API_KEY
+        sync: false
+      - key: LLM2_BASE_URL              # backup model, used when the primary is slow or rate-limited: Groq
+        value: https://api.groq.com/openai/v1
+      - key: LLM2_MODEL
+        value: openai/gpt-oss-120b
+      - key: LLM2_API_KEY
+        sync: false
