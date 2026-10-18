@@ -6,10 +6,10 @@ Built for **Graph Hacks: Context for AI Agents** (WeMakeDevs x FalkorDB). **Trac
 
 | | |
 |---|---|
-| Live demo | _to be added after deployment_ |
+| Live demo | https://keystone-2d8k.onrender.com (a free instance sleeps when idle: the first visit after a quiet spell takes about a minute) |
 | Demo video | _to be added_ |
 | Blog post | _to be added_ |
-| MCP endpoint | `<live demo URL>/mcp` (streamable HTTP) |
+| MCP endpoint | https://keystone-2d8k.onrender.com/mcp (streamable HTTP) |
 
 ![Keystone landing page](docs/img/landing.jpg)
 

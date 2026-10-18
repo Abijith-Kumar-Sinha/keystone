@@ -39,11 +39,14 @@ def _args(raw) -> dict:
 
 
 def chain_from_env() -> list[dict]:
-    """Server-side models in order of preference: the primary (LLM_* or ANTHROPIC_API_KEY), then an optional backup (LLM2_*),
-    used when the primary is slow, overloaded or down. Keys are never sent to the browser."""
+    """Server-side models in order of preference: LLM_* (or ANTHROPIC_API_KEY), then an optional LLM2_*, each used when the one before is
+    slow, rate-limited or down. KEYSTONE_LLM_ORDER=2,1 puts LLM2 first without moving any key. Keys are never sent to the browser."""
     out = [c for c in (from_env(),) if c]
     if os.environ.get("LLM2_API_KEY"):
         out.append({"kind": "openai", "key": os.environ["LLM2_API_KEY"], "model": os.environ.get("LLM2_MODEL"), "base_url": os.environ.get("LLM2_BASE_URL")})
+    order = [int(x) - 1 for x in os.environ.get("KEYSTONE_LLM_ORDER", "").replace(" ", "").split(",") if x.isdigit()]   # "2,1" asks LLM2 first
+    if len(out) > 1 and sorted(order) == list(range(len(out))):
+        out = [out[i] for i in order]
     return out
 
 

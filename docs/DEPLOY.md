@@ -41,8 +41,10 @@ Rate limits apply per client and across everyone, to the API and to `/mcp`.
 
 Without a key, visitors get the keyword router (it handled about two thirds of unseen wording in our evaluation, and a model does the tool choosing properly). The app accepts any OpenAI-compatible endpoint, or Anthropic:
 
-- **Google Gemini** (free tier, no card): key at https://aistudio.google.com/apikey. `LLM_BASE_URL=https://generativelanguage.googleapis.com/v1beta/openai/` and `KEYSTONE_MODEL=gemini-3.5-flash-lite` (fast and available when we tested; `gemini-3.8-flash` was overloaded). The 2.5 models are no longer given to new accounts.
-- **Groq** (free plan): key at https://console.groq.com/keys. `LLM_BASE_URL=https://api.groq.com/openai/v1` and `KEYSTONE_MODEL=openai/gpt-oss-120b`.
+- **Groq** (free plan, no card): key at https://console.groq.com/keys. `https://api.groq.com/openai/v1` with `openai/gpt-oss-120b`. Measured: 2 to 3 seconds per question, but the free plan allows 8,000 tokens a minute (about two questions a minute) and 1,000 requests a day.
+- **Google Gemini** (free tier, no card): key at https://aistudio.google.com/apikey. `https://generativelanguage.googleapis.com/v1beta/openai/` with `gemini-3.6-flash` (about 7 s per question when we measured; `gemini-3.5-flash-lite` took about 13 s that day and `gemini-3.8-flash` timed out). The 2.5 models are no longer given to new accounts.
+
+The deployed site asks Groq first and Gemini second (`KEYSTONE_LLM_ORDER=2,1`, with the Groq key in `LLM2_API_KEY` and the Gemini key in `LLM_API_KEY`): a visitor who asks a second question inside the same minute is served by Gemini, and if both are limited the router answers instantly.
 - Anthropic: `ANTHROPIC_API_KEY` (default model `claude-haiku-5-5`).
 
 The primary model is `LLM_*`; an optional backup is `LLM2_*`. If the primary is rate-limited (free tiers answer 429 when a burst passes their per-minute quota), slow (over 45 s overall) or down, the backup answers, and if both fail the router does. A provider outage never breaks the demo. Keys stay on the server and never reach the browser; the button at the bottom right of the workbench shows MODEL instead of ROUTER, and the TRACE tab says which model answered. Visitors can also paste their own key in the app. Set `KEYSTONE_SERVER_LLM=0` to ignore server keys, and `LLM_REASONING_EFFORT=low` if a reasoning model answers slowly.

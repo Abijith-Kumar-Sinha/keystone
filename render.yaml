@@ -7,18 +7,29 @@ services:
     plan: free
     healthCheckPath: /api/health
     autoDeploy: true
+    buildFilter:                        # a push that only touches these paths does not rebuild the live site
+      ignoredPaths:
+        - docs/**
+        - bench/**
+        - tests/**
+        - scripts/**
+        - .github/**
+        - "*.md"
+        - .impeccable/**
     envVars:
       - key: KEYSTONE_WRITABLE          # base graphs read-only; every visitor gets a private GRAPH.COPY sandbox
         value: sandbox
       - key: MAX_SANDBOXES
         value: "20"
-      - key: LLM_BASE_URL               # primary model: Google Gemini
+      - key: KEYSTONE_LLM_ORDER         # ask Groq (LLM2) first, it answers in 2 to 3 s; Gemini (LLM) is the slower backup
+        value: "2,1"
+      - key: LLM_BASE_URL               # Google Gemini
         value: https://generativelanguage.googleapis.com/v1beta/openai/
       - key: KEYSTONE_MODEL
-        value: gemini-3.5-flash-lite
+        value: gemini-3.6-flash
       - key: LLM_API_KEY
         sync: false
-      - key: LLM2_BASE_URL              # backup model, used when the primary is slow or rate-limited: Groq
+      - key: LLM2_BASE_URL              # Groq
         value: https://api.groq.com/openai/v1
       - key: LLM2_MODEL
         value: openai/gpt-oss-120b

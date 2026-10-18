@@ -300,6 +300,18 @@ def test_posting_a_real_issue_needs_the_operator_token(client, monkeypatch):
         db.client().connection.execute_command("GRAPH.DELETE", db.PREFIX + sb)
 
 
+def test_model_order_can_be_swapped_without_moving_keys(monkeypatch):
+    from keystone import llm
+    for k, v in {"LLM_API_KEY": "k1", "LLM_BASE_URL": "https://a.example/v1", "KEYSTONE_MODEL": "m1", "LLM2_API_KEY": "k2", "LLM2_MODEL": "m2"}.items():
+        monkeypatch.setenv(k, v)
+    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+    monkeypatch.delenv("KEYSTONE_LLM_ORDER", raising=False)
+    assert [c["model"] for c in llm.chain_from_env()] == ["m1", "m2"]
+    monkeypatch.setenv("KEYSTONE_LLM_ORDER", "2,1")
+    assert [c["model"] for c in llm.chain_from_env()] == ["m2", "m1"]
+    monkeypatch.setenv("KEYSTONE_LLM_ORDER", "2,2")                                   # nonsense is ignored
+    assert [c["model"] for c in llm.chain_from_env()] == ["m1", "m2"]
+
 def test_only_a_model_on_this_machine_gets_the_long_budget():
     from keystone import llm
     assert llm.Provider("openai", "k", None, "http://localhost:11434/v1").local is True
