@@ -12,6 +12,7 @@ import functools
 
 import anyio
 from mcp.server.fastmcp import FastMCP
+from mcp.server.transport_security import TransportSecuritySettings
 
 from . import actions as A
 from . import db, memory as M, tools as T, workflow as W
@@ -23,7 +24,17 @@ INSTRUCTIONS = (
     "Use find_modules to turn a fuzzy phrase into an exact module before calling module tools. Typical flow: risk_scan or keystones -> "
     "what_if_leaves -> successors -> succession_review -> draft_actions."
 )
-mcp = FastMCP("keystone", instructions=INSTRUCTIONS, streamable_http_path="/")
+
+
+def _security() -> TransportSecuritySettings:
+    """The SDK's DNS-rebinding guard answers 421 to every Host but localhost. That protects a server on someone's own machine; a public
+    deployment (KEYSTONE_WRITABLE=sandbox) is reached by its own host name, so the guard stays on for local runs only."""
+    return TransportSecuritySettings(enable_dns_rebinding_protection=os.environ.get("KEYSTONE_WRITABLE", "all") != "sandbox",
+                                     allowed_hosts=["127.0.0.1:*", "localhost:*", "[::1]:*"],
+                                     allowed_origins=["http://127.0.0.1:*", "http://localhost:*", "http://[::1]:*"])
+
+
+mcp = FastMCP("keystone", instructions=INSTRUCTIONS, streamable_http_path="/", transport_security=_security())
 DEFAULT = os.environ.get("KEYSTONE_TENANT", "falkordb")
 
 

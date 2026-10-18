@@ -95,8 +95,10 @@ def succession_review(tenant: str, person: str, user: str = "anon") -> dict:
                 plans.append({"module": r["module"], "short": r["short"], "candidate": c["person"], "why": c, "status_before": r["status"],
                               "retained_before": r["retained_active"], "their_share": r["their_share"]})
                 break
+    n_risk = wi["data"]["orphaned"] + wi["data"]["fragile"]          # the plan covers the 5 most load-bearing; say how many the what-if found
+    scope = f"{len(risky)} at-risk modules" if n_risk <= len(risky) else f"{n_risk} modules orphaned or fragile, planning for the {len(risky)} most load-bearing"
     run.step("analyst", "what_if_leaves + successors",
-             f"{len(risky)} at-risk modules; matched {len(plans)} successors within capacity ({CAPACITY} open pairings each, earlier sessions included).",
+             f"{scope}; matched {len(plans)} successors within capacity ({CAPACITY} open pairings each, earlier sessions included).",
              [("Finding", finding["data"]["id"])])
     if not plans:
         run.finish("done")

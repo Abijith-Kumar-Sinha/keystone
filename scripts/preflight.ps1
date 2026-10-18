@@ -12,6 +12,11 @@ Show $true "app answers" "writable=$($h.writable)"
 Show (($h.tenants -contains "falkordb") -and ($h.tenants -contains "pallets")) "both graphs are loaded" ($h.tenants -join ", ")
 Show ($h.server_llm -eq $true) "a model is configured" $(if ($h.server_llm) { $h.models -join " then " } else { "router only: add LLM_API_KEY" })
 foreach ($p in "/", "/workbench", "/static/workbench.js", "/static/fonts/bebas-neue.woff2") { Show ((Invoke-WebRequest -UseBasicParsing -Uri ($Url + $p) -TimeoutSec 60).StatusCode -eq 200) "GET $p" }
+try {                                                  # fails only on a public host name: the MCP SDK answers HTTP 421 to a Host it does not know
+    $m = Invoke-WebRequest -UseBasicParsing -Method Post -Uri "$Url/mcp/" -ContentType "application/json" -Headers @{ Accept = "application/json, text/event-stream" } -TimeoutSec 60 `
+        -Body '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-03-26","capabilities":{},"clientInfo":{"name":"preflight","version":"1"}}}'
+    Show ($m.StatusCode -eq 200) "an outside MCP client can connect to /mcp"
+} catch { Show $false "an outside MCP client can connect to /mcp" $_.Exception.Message }
 
 $box = (Post "/api/sandbox" @{ base = "falkordb" }).tenant
 Show $true "private sandbox created" $box

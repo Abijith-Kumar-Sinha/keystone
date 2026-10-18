@@ -71,6 +71,10 @@ _SUCC = r"\b(successors?|replac\w*|takes? over|steps? (in|up)|stands? in|backups
 _GRAPHY = re.compile(r"\b(who|whom|people|person|team|engineers?|developers?|contributors?|maintainers?|knowledge|modules?|repos?|codebase|code|project|"
                      r"risks?|bus|truck|owner|ownership|critical|lose|leave|quit|replace|reviews?|reviewed|prs?|pull requests?|org|organi[sz]ation|"
                      r"status|health|doing|state)\b", re.I)
+# The model is shown the three tools that write to the graph only when the question (or the one before it) asks for a plan, drafts or a note.
+WRITE_TOOLS = {"succession_review", "draft_actions", "note_finding"}
+_WRITES = re.compile(r"\b(plan(s|ning)?|succession|hand-?(off|over)|onboard|pair(ing)?|draft|artifacts?|codeowners|issues?|patch|remember|note|save|record|"
+                     r"keep in mind|what (should|do|can) we do|act on|yes|ok(ay)?|go ahead|do it|proceed|approve)\b", re.I)
 OUT_OF_SCOPE = ("That is outside this graph. I can answer who holds the knowledge of a codebase, what breaks if someone leaves, "
                 "who could step in, and what to do about it.")
 
@@ -259,6 +263,8 @@ async def ask(tenant: str, question: str, history: list[dict] | None = None, pro
             """One model, up to six tool rounds. Returns (answer, why it was not used)."""
             try:
                 specs = _specs((await client.list_tools()).tools)
+                if not _WRITES.search(question + " " + next((h["content"] for h in reversed(history) if h["role"] == "user"), "")):
+                    specs = [s for s in specs if s["name"] not in WRITE_TOOLS]      # read-only unless the user asks for a plan, drafts or a note
                 st = prov.start(SYSTEM, history, question)
                 text = None
                 for _ in range(6):

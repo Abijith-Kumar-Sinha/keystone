@@ -153,7 +153,27 @@ def test_llm_loop_calls_tools_through_mcp_and_keeps_grounded_prose():
     r = asyncio.run(agent.ask(T, "what breaks without alice?", provider=m))
     assert r["mode"] == "llm" and r["notes"] == []
     assert r["answer"].startswith("If @alice leaves") and r["trace"][0]["via"] == "mcp" and r["trace"][0]["tool"] == "what_if_leaves"
-    assert len(m.specs) == 15 and all("tenant" not in s["parameters"].get("properties", {}) for s in m.specs)   # the model can never pick a tenant
+    assert len(m.specs) == 12 and not {s["name"] for s in m.specs} & agent.WRITE_TOOLS        # a plain question is not offered the tools that write
+    assert all("tenant" not in s["parameters"].get("properties", {}) for s in m.specs)        # the model can never pick a tenant
+
+
+def test_write_tools_are_offered_only_when_the_question_asks_for_them():
+    def offered(q, history=None):
+        m = FakeModel(("", [("c1", "what_if_leaves", {"person": "alice"})]), ("If @alice leaves, core is the module that hurts.", []))
+        asyncio.run(agent.ask(T, q, history, provider=m))
+        return {s["name"] for s in m.specs} & agent.WRITE_TOOLS
+    assert offered("If alice leaves, what breaks and who could step in?") == set()
+    assert offered("Make a succession plan for alice") == agent.WRITE_TOOLS
+    assert offered("Remember that alice is on leave") == agent.WRITE_TOOLS
+    assert offered("and for bob?", [{"role": "user", "content": "Draft the issues for alice"}]) == agent.WRITE_TOOLS      # a follow-up inherits the intent
+
+
+def test_mcp_host_guard_is_on_locally_and_off_for_a_public_deployment(monkeypatch):
+    from keystone import mcp_server
+    monkeypatch.delenv("KEYSTONE_WRITABLE", raising=False)
+    assert mcp_server._security().enable_dns_rebinding_protection         # a local server must not answer a DNS-rebinding page
+    monkeypatch.setenv("KEYSTONE_WRITABLE", "sandbox")
+    assert not mcp_server._security().enable_dns_rebinding_protection     # a public host name must not get HTTP 421
 
 
 def test_llm_prose_naming_someone_the_tools_did_not_return_is_discarded():
