@@ -35,7 +35,7 @@ LLM_HOSTS = {"api.anthropic.com", "api.openai.com", "generativelanguage.googleap
 _sandboxes: dict[str, float] = {}               # name -> when it was last used (it is deleted after SANDBOX_TTL idle seconds)
 _owner: dict[str, str] = {}                      # name -> the client that started it
 _hits: dict[tuple, deque] = {}                   # (client or "*", bucket) -> recent request times
-MAX_PER_CLIENT = int(os.environ.get("MAX_SANDBOXES_PER_CLIENT", 4))
+MAX_PER_CLIENT = int(os.environ.get("MAX_SANDBOXES_PER_CLIENT", 6))
 
 
 TRUSTED_PROXIES = int(os.environ.get("KEYSTONE_TRUSTED_PROXIES", 1))   # reverse proxies in front of the app (Render, Hugging Face: 1; none: 0)
@@ -206,8 +206,11 @@ def sandbox(body: Sandbox, request: Request):
     sweep()
     me = client_ip(request)
     mine = [n for n in _sandboxes if _owner.get(n) == me]
-    if len(mine) >= MAX_PER_CLIENT:                      # a client replaces its own least recently used sandbox; it can never push out someone else's
-        drop_sandbox(min(mine, key=_sandboxes.get))
+    if len(mine) >= MAX_PER_CLIENT:
+        idlest = min(mine, key=_sandboxes.get)
+        if time.time() - _sandboxes[idlest] < 120:       # one address can be several visitors (a campus, a proxy): never cut off a sandbox that is in use
+            raise HTTPException(429, f"This address already has {MAX_PER_CLIENT} active sandboxes. Use one of them, or retry in a minute.")
+        drop_sandbox(idlest)                             # an idle one of its own is fair game
     while len(_sandboxes) >= MAX_SANDBOXES:
         idlest = min(_sandboxes, key=_sandboxes.get)
         if time.time() - _sandboxes[idlest] < 120:       # every sandbox was used in the last two minutes: refuse rather than cut anyone off

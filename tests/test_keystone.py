@@ -258,18 +258,24 @@ def test_client_address_ignores_what_the_client_forges_and_the_global_cap_holds(
     assert ("7.7.7.5", "capcheck") not in api._hits and len(api._hits) <= 6          # the refused requests left no entries behind
 
 
-def test_one_client_cannot_crowd_out_the_others_sandboxes(client, monkeypatch):
+def test_one_client_cannot_crowd_out_sandboxes_and_never_cuts_one_off_that_is_in_use(client, monkeypatch):
     from keystone import api
     api._hits.clear()
+    api._sandboxes.clear()                                                            # earlier tests deleted their graphs directly and left bookkeeping behind
+    api._owner.clear()
     monkeypatch.setattr(api, "MAX_PER_CLIENT", 2)
-    made = [client.post("/api/sandbox", json={"base": T}).json()["tenant"] for _ in range(3)]
+    a, b = (client.post("/api/sandbox", json={"base": T}).json()["tenant"] for _ in range(2))
+    made = [a, b]
     try:
-        assert not db.exists(made[0]) and db.exists(made[1]) and db.exists(made[2])    # it replaced its own oldest, nobody else's
-        assert sum(1 for n in api._sandboxes if api._owner.get(n) == api._owner[made[2]]) == 2
+        busy = client.post("/api/sandbox", json={"base": T})
+        assert busy.status_code == 429 and db.exists(a) and db.exists(b)             # both are in use: refused, nobody is cut off
+        api._sandboxes[a] -= 200                                                      # a has now been idle for over two minutes
+        c = client.post("/api/sandbox", json={"base": T}).json()["tenant"]
+        made.append(c)
+        assert not db.exists(a) and db.exists(b) and db.exists(c)                    # the idle one was replaced, the active one was not
     finally:
         for n in made:
             api.drop_sandbox(n)
-
 
 def test_mcp_mount_is_rate_limited(client):
     from keystone import api
