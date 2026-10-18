@@ -43,15 +43,17 @@ Ask it in plain English, or drive the same tools from Claude Desktop, Claude Cod
 - One graph per organisation, plus a private `GRAPH.COPY` sandbox per visitor, so writes never leak between users.
 - Read tools run through `GRAPH.RO_QUERY`, so a read tool cannot mutate the graph.
 
-## Track 01 map
+## Track 01, criterion by criterion
 
-| Track 01 focus | Where it lives |
-|---|---|
-| Multi-hop reasoning | `successors` (reviewed-for + co-change adjacency), `path_between` (`algo.SPpaths`), `what_if_leaves` |
-| Graph queries and algorithms as agent tools | 15 human-written tools in `keystone/tools.py`, `memory.py`, `workflow.py`, `actions.py`; algorithms in `load.ALGOS` |
-| Tool selection through MCP | `keystone/mcp_server.py`; the in-app agent lists and calls tools through the MCP protocol on every request (`keystone/agent.py`); also served at `/mcp` |
-| Actions based on what the graph shows | `succession_review` (writes Decision and Tasks), `draft_actions` (CODEOWNERS patch and issues, dry run), optional `execute` into one repo you own |
-| Explainable results | every result carries `path` and `sources` built from the same rows as the answer; four explicit outcomes: `answered`, `from_memory`, `not_in_graph`, `unknown_entity` |
+What Keystone does for each Track 01 focus, and how to see it in under a minute on the [live demo](https://keystone-2d8k.onrender.com) (open the workbench; the command line at the bottom talks to the agent, **PROOF** and **TRACE** show what it did).
+
+| Track 01 focus | What Keystone does | See it |
+|---|---|---|
+| Multi-hop reasoning | `successors` walks `reviewer -REVIEWED-> PR <-AUTHORED- leaver` and `PR -TOUCHES-> Module`, and `Module <-CO_CHANGES- Module <-KNOWS- person`. `path_between` runs `algo.SPpaths` over the knowledge graph. `what_if_leaves` re-solves the whole graph on a `GRAPH.COPY` fork. | Ask **Who steps in for Anchel123?**: barakb ranks first (reviewed 269 of his PRs) and PROOF draws the chain. Ask **How is Anchel123 connected to barakb?**: two hops, through `falkordb-browser:app/lib`. |
+| Graph queries and algorithms as agent tools | 15 human-written tools, each running named Cypher (all of it in [docs/QUERIES.md](docs/QUERIES.md)). `path_between` runs `algo.SPpaths` when asked. PageRank, label propagation and betweenness run once at load, and `module_risk`, `keystones`, `risk_scan` and `knowledge_map` read what they stored. | TRACE lists each tool, its milliseconds and the named queries behind the answer. |
+| Tool selection through MCP | The model chooses among the 15 tools and never writes Cypher. The in-app agent lists and calls the tools through the MCP protocol on every request, and the same tools are served at `/mcp` to Claude Desktop, Claude Code or any MCP client. | `claude mcp add --transport http keystone https://keystone-2d8k.onrender.com/mcp`, then ask for `keystones`. |
+| Actions based on what the graph shows | Three roles hand off only through graph state: the Analyst runs the what-if, the Planner simulates a pairing plan on a fork and writes a Decision and Tasks, the Reviewer re-verifies them from the graph on a fresh fork. An approved plan becomes a CODEOWNERS patch and an issue per pairing. These are dry runs unless an operator opts in, and the model is shown the three tools that write only when the question asks for a plan, drafts or a note. | Click **Make the plan** (verdict **Approved**, the wall heals), then **Draft the patch**. |
+| Explainable results | Every result carries a `path` and `sources` built from the same rows as the answer, the names of the queries, and one of four outcomes: `answered`, `from_memory`, `not_in_graph`, `unknown_entity`. A person named in the model's prose who is not in the tool rows throws the prose away. | PROOF, then TRACE. Ask **Who knows about Kubernetes operators?**: it says that is not in the graph. |
 
 ## Architecture
 
@@ -128,7 +130,7 @@ stdio (local):
                                 "env": { "KEYSTONE_TENANT": "falkordb" } } } }
 ```
 
-HTTP (the running app, or the live demo): `claude mcp add --transport http keystone http://localhost:8000/mcp`
+HTTP, against a local run: `claude mcp add --transport http keystone http://localhost:8000/mcp`. Against the live demo: `claude mcp add --transport http keystone https://keystone-2d8k.onrender.com/mcp` (the shared graphs there are read-only, so the three write tools answer that they need a sandbox).
 
 ### Refresh the data
 
@@ -172,7 +174,7 @@ Latency on the real FalkorDB snapshot (3,664 PRs, 62 people, 114 tracked modules
 | Groq gpt-oss-120b | **fresh** | 20 | **85%** | **95%** | 100% | 2.6 s |
 | Qwen3-VL 8B on a laptop GPU (Ollama) | dev | 27 | 93% | 100% | 100% | 94 s |
 
-What this says. A model picks the right tool for about 85 of 100 unseen questions where the keyword router manages 65, and nobody's answer ever named a person the tools did not return. The misses are the interesting kind: both models read "what did the last review say" as `recall` rather than `changes_since`, one asked `overview` for "who is the CEO" where it should have declined, and Gemini answered "keep in mind that barakb is moving" by running the planning and drafting tools instead of noting it. That last one made us add a rule to the system prompt (write tools only when the user asks for a plan, drafts or a note), so the `fresh` set is no longer unseen for the prompt; the numbers above are from before that change. Results per run are in `bench/agent_eval_*.json`; rerun with `python -m bench.agent_eval --llm --set fresh` (add `--which backup` for the second model).
+What this says. A model picks the right tool for about 85 of 100 unseen questions where the keyword router manages 65, and nobody's answer ever named a person the tools did not return. The misses are the interesting kind: both models read "what did the last review say" as `recall` rather than `changes_since`, one asked `overview` for "who is the CEO" where it should have declined, and Gemini answered "keep in mind that barakb is moving" by running the planning and drafting tools instead of noting it. That last one made us add a rule to the system prompt (write tools only when the user asks for a plan, drafts or a note), so the `fresh` set is no longer unseen for the prompt; the numbers above are from before that change. Checking the live site afterwards, Gemini still answered "if X leaves, what breaks and who could step in?" with `succession_review`, a tool that writes a plan to the graph, and its prose then said 5 modules were fragile when the what-if had found 21 (5 was the number the plan covers). A rule in a prompt is not a guarantee, so the code now enforces it: the model is not shown `succession_review`, `draft_actions` or `note_finding` unless the question (or the one before it) asks for a plan, drafts or a note, and the Analyst step reports the real count and how many the plan covers. Results per run are in `bench/agent_eval_*.json`; rerun with `python -m bench.agent_eval --llm --set fresh` (add `--which backup` for the second model).
 
 The real model path is also covered by tests that need no key (`FakeModel` in `tests/test_keystone.py`): tool calls go through MCP, the model can never choose a tenant, ungrounded prose is discarded, and an empty, slow, failing or tool-less model falls back to the backup model and then the router without leaking a key.
 ## Safety, privacy and limits

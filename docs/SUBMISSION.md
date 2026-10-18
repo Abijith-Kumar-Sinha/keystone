@@ -35,6 +35,14 @@ Keystone reads the merged pull requests of FalkorDB's own public repositories (a
 
 **Explainable and honest.** Every answer carries the nodes and edges it was built from (the PROOF button), the named Cypher statements and the public PR links (TRACE). Four explicit outcomes: `answered`, `from_memory`, `not_in_graph`, `unknown_entity`. The model only chooses tools and never writes Cypher, and a person named in its prose must appear in the tool rows or the prose is thrown away. On 20 never-tuned questions a model chose the right tool 85% of the time (the keyword fallback 65%) with 100% grounded answers. A backtest of an April plan against October reality found its picks came true 95% of the time against 39% for random, and says plainly that a simple "most active" rule ties it in teams this small.
 
+## How it meets Track 01
+
+- **Multi-hop reasoning.** `successors` walks reviewer to PR to leaver and PR to module, plus module to co-changing module to the people who know it; `path_between` runs `algo.SPpaths` (Anchel123 to barakb is two hops, through `falkordb-browser:app/lib`); `what_if_leaves` re-solves the graph on a `GRAPH.COPY` fork.
+- **Graph queries and algorithms as agent tools.** 15 human-written tools over named Cypher. `path_between` runs `algo.SPpaths` when asked; PageRank, label propagation and betweenness run once at load and four tools read what they stored.
+- **Tool selection through MCP.** The model picks among the 15 tools and never writes Cypher. The in-app agent calls them through the MCP protocol on every request, and `/mcp` serves the same tools to Claude Desktop, Claude Code or any MCP client.
+- **Actions based on what the graph shows.** Analyst, Planner and Reviewer hand off only through graph state, ending in a Decision with Tasks, a CODEOWNERS patch and issue drafts (dry run by default). The model is shown the tools that write only when the question asks for a plan, drafts or a note.
+- **Explainable results.** Every answer carries its path, public PR links and the names of its queries, with four explicit outcomes; prose that names anyone the tools did not return is discarded.
+
 ## How to run it
 
 `docker compose up --build`, then open http://localhost:8000 (FalkorDB Browser on :3000). Or use the live deployment above. The MCP endpoint is `<live address>/mcp`. Full setup, the graph data model and every query are in the README and `docs/QUERIES.md`.

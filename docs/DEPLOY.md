@@ -28,7 +28,7 @@ Public deployments set `KEYSTONE_WRITABLE=sandbox` (already the image default): 
 
 | Variable | Default | What it does |
 |---|---|---|
-| `KEYSTONE_WRITABLE` | `sandbox` in the image | Base graphs are read-only; only a visitor's private sandbox accepts writes. |
+| `KEYSTONE_WRITABLE` | `sandbox` in the image | Base graphs are read-only; only a visitor's private sandbox accepts writes. It also lets `/mcp` answer to the public host name: with any other value the MCP SDK's DNS-rebinding guard accepts only `localhost` and replies HTTP 421 to everything else. |
 | `MAX_SANDBOXES` | 40 (20 in `render.yaml`) | How many sandboxes exist at once. If every one was used in the last two minutes a new one is refused with 503 "busy"; otherwise the least recently used is replaced. |
 | `MAX_SANDBOXES_PER_CLIENT` | 6 | One address may hold this many sandboxes. Past that it gets 429 unless one of its own has been idle for two minutes, which is then replaced; an active sandbox is never cut off, because an address can be several visitors. |
 | `SANDBOX_TTL` | 10800 | Seconds a sandbox may sit idle before it is deleted. |
@@ -42,7 +42,7 @@ Rate limits apply per client and across everyone, to the API and to `/mcp`.
 Without a key, visitors get the keyword router (it handled about two thirds of unseen wording in our evaluation, and a model does the tool choosing properly). The app accepts any OpenAI-compatible endpoint, or Anthropic:
 
 - **Groq** (free plan, no card): key at https://console.groq.com/keys. `https://api.groq.com/openai/v1` with `openai/gpt-oss-120b`. Measured: 2 to 3 seconds per question, but the free plan allows 8,000 tokens a minute (about two questions a minute) and 1,000 requests a day.
-- **Google Gemini** (free tier, no card): key at https://aistudio.google.com/apikey. `https://generativelanguage.googleapis.com/v1beta/openai/` with `gemini-3.6-flash` (about 7 s per question when we measured; `gemini-3.5-flash-lite` took about 13 s that day and `gemini-3.8-flash` timed out). The 2.5 models are no longer given to new accounts.
+- **Google Gemini** (free tier, no card): key at https://aistudio.google.com/apikey. `https://generativelanguage.googleapis.com/v1beta/openai/` with `gemini-3.5-flash-lite` (3 to 13 s per question depending on the hour; it served all of our evaluation runs without hitting a daily limit). Do not pick `gemini-3.6-flash` for a public demo: it answered in about 7 s but its free plan allows only 20 requests a day, which ran out within hours; `gemini-3.8-flash` timed out. The 2.5 models are no longer given to new accounts.
 
 The deployed site asks Groq first and Gemini second (`KEYSTONE_LLM_ORDER=2,1`, with the Groq key in `LLM2_API_KEY` and the Gemini key in `LLM_API_KEY`): a visitor who asks a second question inside the same minute is served by Gemini, and if both are limited the router answers instantly.
 - Anthropic: `ANTHROPIC_API_KEY` (default model `claude-haiku-5-5`).
@@ -66,4 +66,4 @@ docker compose up --build            # app http://localhost:8000, FalkorDB Brows
 
 - `GET /api/health` returns `"writable":"sandbox"`, both tenants, and the model names if you set keys.
 - A write against a base graph (for example `succession_review` on `falkordb`) is refused; the same call on your sandbox works.
-- `claude mcp add --transport http keystone https://<host>/mcp` lists 15 tools.
+- `claude mcp add --transport http keystone https://<host>/mcp` lists 15 tools. Check this from a machine that is not the server: it is the one check that only fails on a public host name (HTTP 421 "Invalid Host header" means `KEYSTONE_WRITABLE` is not `sandbox`).
